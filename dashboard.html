@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KatsuBot — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#090b12;--bg2:#0d0f1c;--bg3:#111426;--bg4:#161930;
+  --border:#1c1f35;--border2:#232640;
+  --text:#dde2f5;--text2:#6a6f92;--text3:#363a5a;
+  --accent:#5b72f2;--accent2:#7c52e8;
+  --green:#3ecf8e;--red:#e85252;--yellow:#f0b429;--orange:#f07830;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* LOGIN */
+#login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 60% 40%,#5b72f215 0%,transparent 60%),
+             radial-gradient(ellipse at 20% 80%,#7c52e810 0%,transparent 50%),var(--bg);}
+.login-card{text-align:center;padding:52px 48px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:20px;max-width:400px;width:90%;box-shadow:0 32px 80px #00000060;}
+.login-logo{width:64px;height:64px;border-radius:18px;margin:0 auto 20px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 0 40px #5b72f230;}
+.login-title{font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px;}
+.login-sub{color:var(--text2);font-size:14px;margin:10px 0 32px;line-height:1.6;}
+.login-btn{display:inline-flex;align-items:center;gap:10px;background:#5865F2;border:none;border-radius:12px;
+  padding:13px 28px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;
+  transition:all .2s;text-decoration:none;}
+.login-btn:hover{background:#4752c4;transform:translateY(-2px);box-shadow:0 8px 24px #5865f240;}
+.login-btn svg{width:20px;height:20px;}
+
+/* GUILDS */
+#guilds-page{min-height:100vh;padding:40px 24px;}
+.guilds-header{max-width:900px;margin:0 auto 32px;display:flex;align-items:center;justify-content:space-between;}
+.guilds-header-left{display:flex;align-items:center;gap:14px;}
+.user-avatar{width:42px;height:42px;border-radius:50%;border:2px solid var(--border2);}
+.user-name{font-weight:700;font-size:15px;}.user-tag{font-size:12px;color:var(--text2);margin-top:1px;}
+.page-title{font-size:22px;font-weight:800;color:#fff;max-width:900px;margin:0 auto 6px;}
+.page-sub{font-size:13px;color:var(--text2);max-width:900px;margin:0 auto 20px;}
+.guilds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;max-width:900px;margin:0 auto;}
+.guild-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;}
+.guild-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 32px #5b72f215;}
+.guild-icon{width:48px;height:48px;border-radius:12px;background:var(--bg3);display:flex;align-items:center;
+  justify-content:center;font-size:20px;font-weight:700;color:var(--accent);flex-shrink:0;overflow:hidden;}
+.guild-icon img{width:100%;height:100%;object-fit:cover;border-radius:12px;}
+.guild-name{font-weight:600;font-size:14px;}.guild-sub{font-size:11px;color:var(--text2);margin-top:3px;}
+
+/* DASHBOARD */
+#dashboard-page{display:flex;min-height:100vh;}
+.sidebar{width:220px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;position:fixed;top:0;left:0;padding:20px 10px;gap:2px;overflow-y:auto;}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:4px 8px 18px;border-bottom:1px solid var(--border);margin-bottom:10px;}
+.logo-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 16px #5b72f225;flex-shrink:0;}
+.logo-text{font-weight:800;font-size:14px;color:#fff;}.logo-sub{font-size:10px;color:var(--text3);}
+.guild-switcher{margin:0 2px 10px;padding:9px 10px;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:border-color .15s;}
+.guild-switcher:hover{border-color:var(--accent);}
+.gs-icon{width:28px;height:28px;border-radius:7px;background:var(--bg4);display:flex;align-items:center;
+  justify-content:center;font-size:13px;font-weight:700;color:var(--accent);flex-shrink:0;overflow:hidden;}
+.gs-icon img{width:100%;height:100%;object-fit:cover;border-radius:7px;}
+.gs-name{font-size:12px;font-weight:600;color:var(--text);flex:1;}.gs-arrow{color:var(--text3);font-size:10px;}
+.nav-label{font-size:10px;letter-spacing:1.5px;color:var(--text3);font-weight:700;padding:8px 10px 3px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;
+  font-size:13px;font-weight:500;color:var(--text2);border:1px solid transparent;transition:all .12s;
+  background:none;width:100%;text-align:left;font-family:inherit;}
+.nav-item:hover{color:var(--text);background:var(--bg3);}
+.nav-item.active{color:var(--accent);background:#5b72f210;border-color:#5b72f218;}
+.sidebar-bottom{margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--border);display:flex;align-items:center;gap:9px;}
+.sb-avatar{width:30px;height:30px;border-radius:50%;}
+.sb-name{font-size:12px;font-weight:600;color:var(--text2);flex:1;}
+.sb-logout{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:4px;border-radius:6px;transition:color .15s;}
+.sb-logout:hover{color:var(--red);}
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column;}
+.topbar{height:55px;padding:0 26px;border-bottom:1px solid var(--border);display:flex;align-items:center;
+  justify-content:space-between;background:var(--bg2);position:sticky;top:0;z-index:50;}
+.topbar-title{font-weight:700;font-size:15px;color:#fff;}
+.save-btn{background:var(--accent);border:none;border-radius:9px;padding:8px 20px;color:#fff;
+  font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;font-family:inherit;}
+.save-btn:hover{background:#4a61e0;}.save-btn.saved{background:var(--green);}
+.content{padding:26px;display:flex;flex-direction:column;gap:22px;max-width:1000px;}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.card-title{font-size:10px;letter-spacing:1.5px;color:var(--text3);font-weight:700;text-transform:uppercase;padding:14px 18px 0;}
+.field-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-bottom:1px solid var(--border);gap:16px;}
+.field-row:last-child{border-bottom:none;}
+.field-label{font-size:13px;font-weight:500;white-space:nowrap;}
+.field-desc{font-size:11px;color:var(--text3);margin-top:2px;}
+
+/* INPUTS */
+select,input[type=text],input[type=number]{background:var(--bg3);border:1.5px solid var(--border2);
+  border-radius:8px;padding:7px 10px;color:var(--text);font-family:inherit;font-size:13px;
+  outline:none;transition:border-color .2s;}
+select:focus,input:focus{border-color:var(--accent);}
+select option{background:var(--bg3);color:var(--text);}
+select{min-width:180px;max-width:220px;cursor:pointer;}
+input[type=number]{width:76px;font-family:'DM Mono',monospace;}
+input[type=text]{min-width:160px;}
+
+/* TOGGLE */
+.toggle{position:relative;width:40px;height:22px;cursor:pointer;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;border-radius:11px;background:var(--bg3);border:1.5px solid var(--border2);transition:all .2s;}
+.toggle-slider::before{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:var(--text3);top:2px;left:2px;transition:all .2s;}
+.toggle input:checked+.toggle-slider{border-color:var(--accent);background:#5b72f215;}
+.toggle input:checked+.toggle-slider::before{background:var(--accent);transform:translateX(18px);box-shadow:0 0 8px var(--accent);}
+
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:6px;padding:0 18px 14px;}
+.tag{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:5px 9px;font-size:12px;}
+.tag-level{color:var(--accent);font-family:'DM Mono',monospace;font-weight:500;}
+.tag-name{color:var(--text2);}
+.tag-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;line-height:1;padding:0;}
+.tag-del:hover{color:var(--red);}
+
+/* ADD ROW */
+.add-row{display:flex;gap:7px;padding:0 18px 14px;flex-wrap:wrap;align-items:center;}
+.add-row input{flex:1;min-width:90px;}
+.btn-add{background:var(--accent);border:none;border-radius:8px;padding:7px 14px;color:#fff;font-weight:700;
+  font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;}
+.btn-add:hover{background:#4a61e0;}
+.btn-add.green{background:var(--green);color:#0b1a12;}.btn-add.green:hover{background:#32b87a;}
+.btn-add.red{background:var(--red);}.btn-add.red:hover{background:#c93e3e;}
+
+/* SHOP / LIST ITEMS */
+.item-list{display:flex;flex-direction:column;gap:7px;padding:0 18px 14px;}
+.item-row{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);
+  border:1px solid var(--border2);border-radius:9px;padding:10px 13px;}
+.item-row-left{display:flex;align-items:center;gap:9px;}
+.badge{font-family:'DM Mono',monospace;font-size:11px;padding:2px 8px;border-radius:5px;}
+.badge-yellow{background:#f0b42918;color:var(--yellow);border:1px solid #f0b42928;}
+.badge-red{background:#e8525218;color:var(--red);border:1px solid #e8525228;}
+.badge-green{background:#3ecf8e18;color:var(--green);border:1px solid #3ecf8e28;}
+.badge-blue{background:#5b72f218;color:var(--accent);border:1px solid #5b72f228;}
+.btn-del{background:#e8525215;border:1px solid #e8525222;border-radius:6px;padding:4px 10px;
+  color:var(--red);cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;}
+.btn-del:hover{background:#e8525230;}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.stat-label{font-size:11px;color:var(--text2);font-weight:500;margin-bottom:6px;}
+.stat-value{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.5px;font-family:'DM Mono',monospace;}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+
+/* TOP PLAYERS */
+.top-player{display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--border);}
+.top-player:last-child{border-bottom:none;}
+.rank{width:22px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);text-align:center;flex-shrink:0;}
+.rank.gold{color:var(--yellow);}.rank.silver{color:#aab0c0;}.rank.bronze{color:var(--orange);}
+.player-avatar{width:28px;height:28px;border-radius:50%;background:var(--bg3);flex-shrink:0;overflow:hidden;}
+.player-avatar img{width:100%;height:100%;object-fit:cover;}
+.player-name{flex:1;font-size:13px;font-weight:500;}
+.player-xp{font-size:12px;font-weight:600;color:var(--accent);font-family:'DM Mono',monospace;}
+.player-lvl{font-size:11px;color:var(--text3);margin-left:10px;font-family:'DM Mono',monospace;}
+
+/* MEMBRES */
+.membre-card{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+.membre-card:hover{background:var(--bg3);}
+.membre-card:last-child{border-bottom:none;}
+.membre-avatar{width:36px;height:36px;border-radius:50%;background:var(--bg3);flex-shrink:0;overflow:hidden;}
+.membre-avatar img{width:100%;height:100%;object-fit:cover;}
+.membre-name{flex:1;font-size:13px;font-weight:500;}
+.membre-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+
+/* SANCTIONS */
+.sanction-item{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;}
+.sanction-item:last-child{border-bottom:none;}
+.sanction-type{width:70px;flex-shrink:0;}
+.sanction-info{flex:1;}
+.sanction-raison{font-size:13px;color:var(--text);}
+.sanction-meta{font-size:11px;color:var(--text3);margin-top:3px;}
+
+/* LOGS */
+.log-item{padding:10px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.log-item:last-child{border-bottom:none;}
+.log-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.log-action{font-size:13px;font-weight:500;flex:1;}
+.log-time{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;}
+
+/* MISSIONS */
+.mission-card{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;
+  display:flex;align-items:center;gap:14px;}
+.mission-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.mission-info{flex:1;}
+.mission-title{font-size:13px;font-weight:600;}
+.mission-desc{font-size:11px;color:var(--text2);margin-top:2px;}
+.mission-rewards{display:flex;gap:6px;margin-top:6px;}
+
+/* SEARCH */
+.search-bar{display:flex;align-items:center;gap:10px;padding:14px 18px 0;}
+.search-bar input{flex:1;background:var(--bg3);border:1.5px solid var(--border2);border-radius:8px;
+  padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;outline:none;}
+.search-bar input:focus{border-color:var(--accent);}
+
+/* PANEL HEADER */
+.panel-header{margin-bottom:2px;}
+.panel-header h2{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.4px;}
+.panel-header p{font-size:13px;color:var(--text2);margin-top:4px;}
+.empty{color:var(--text3);font-size:12px;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:#00000080;z-index:200;display:flex;align-items:center;justify-content:center;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;width:90%;max-width:480px;max-height:85vh;overflow-y:auto;}
+.modal h3{font-size:17px;font-weight:700;color:#fff;margin-bottom:20px;}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+.btn-cancel{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 16px;
+  color:var(--text2);cursor:pointer;font-family:inherit;font-size:13px;}
+.modal-field{margin-bottom:14px;}
+.modal-field label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;}
+.modal-field input,.modal-field select{width:100%;}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--green);color:#061a0e;
+  padding:10px 18px;border-radius:10px;font-weight:700;font-size:13px;
+  opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;box-shadow:0 4px 20px #3ecf8e35;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.error{background:var(--red);color:#fff;}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.content>*{animation:fadeIn .18s ease;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-page" style="display:none">
+  <div class="login-card">
+    <div class="login-logo">⚡</div>
+    <div class="login-title">KatsuBot Dashboard</div>
+    <div class="login-sub">Connecte-toi avec ton compte Discord pour gérer ton bot.</div>
+    <a class="login-btn" href="http://localhost:8000/login">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      Se connecter avec Discord
+    </a>
+  </div>
+</div>
+
+<!-- GUILDS -->
+<div id="guilds-page" style="display:none">
+  <div class="guilds-header">
+    <div class="guilds-header-left">
+      <img class="user-avatar" id="g-avatar" src="" alt="">
+      <div><div class="user-name" id="g-username"></div><div class="user-tag" id="g-tag"></div></div>
+    </div>
+    <button onclick="logout()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:7px 14px;color:var(--text2);cursor:pointer;font-family:inherit;font-size:13px;">Se déconnecter</button>
+  </div>
+  <div class="page-title">Choisis un serveur</div>
+  <div class="page-sub">Seuls les serveurs où ton bot est présent et où tu es admin sont affichés.</div>
+  <div class="guilds-grid" id="guilds-grid"></div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard-page" style="display:none">
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">⚡</div>
+      <div><div class="logo-text">KatsuBot</div><div class="logo-sub">Dashboard v3</div></div>
+    </div>
+    <div class="guild-switcher" onclick="showGuilds()">
+      <div class="gs-icon" id="sb-guild-icon"></div>
+      <div class="gs-name" id="sb-guild-name">Serveur</div>
+      <div class="gs-arrow">▼</div>
+    </div>
+    <div class="nav-label">Configuration</div>
+    <button class="nav-item active" onclick="nav('general',this)">⚙️ &nbsp;Général</button>
+    <button class="nav-item" onclick="nav('logs',this)">📋 &nbsp;Logs</button>
+    <button class="nav-item" onclick="nav('xp',this)">⭐ &nbsp;Niveaux & XP</button>
+    <button class="nav-item" onclick="nav('shop',this)">🛒 &nbsp;Shop</button>
+    <button class="nav-item" onclick="nav('moderation',this)">🛡️ &nbsp;Modération</button>
+    <button class="nav-item" onclick="nav('tickets',this)">🎫 &nbsp;Tickets</button>
+    <button class="nav-item" onclick="nav('reaction_roles',this)">🎭 &nbsp;Reaction Roles</button>
+    <button class="nav-item" onclick="nav('missions',this)">🎯 &nbsp;Missions</button>
+    <div class="nav-label" style="margin-top:6px">Membres</div>
+    <button class="nav-item" onclick="nav('membres',this)">👥 &nbsp;Membres</button>
+    <button class="nav-item" onclick="nav('sanctions',this)">⚠️ &nbsp;Sanctions</button>
+    <div class="nav-label" style="margin-top:6px">Statistiques</div>
+    <button class="nav-item" onclick="nav('stats',this)">📊 &nbsp;Stats XP</button>
+    <button class="nav-item" onclick="nav('historique',this)">🕓 &nbsp;Historique logs</button>
+    <a href="https://discord.com/oauth2/authorize?client_id=1477435150806683780&permissions=8&integration_type=0&scope=bot+applications.commands" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;color:var(--green);font-size:13px;font-weight:500;text-decoration:none;transition:all .12s;border:1px solid transparent;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">
+      ➕ &nbsp;Ajouter le bot
+    </a>
+    <div id="bot-status" style="display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:12px;color:var(--text3)">
+      <div id="status-dot" style="width:7px;height:7px;border-radius:50%;background:var(--text3)"></div>
+      <span id="status-text">Vérification...</span>
+    </div>
+    <div class="sidebar-bottom">
+      <img class="sb-avatar" id="sb-avatar" src="" alt="">
+      <div class="sb-name" id="sb-name"></div>
+      <button class="sb-logout" onclick="logout()" title="Déconnexion">⏏</button>
+    </div>
+  </nav>
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title" id="topbar-title">⚙️ Général</div>
+      <button class="save-btn" id="save-btn" onclick="saveConfig()">Enregistrer</button>
+    </header>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- MODAL PROFIL -->
+<div id="modal-profil" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-profil')">
+  <div class="modal" id="modal-profil-content"></div>
+</div>
+
+<!-- MODAL MISSION -->
+<div id="modal-mission" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-mission')">
+  <div class="modal">
+    <h3>➕ Ajouter une mission</h3>
+    <div class="modal-field"><label>Titre</label><input type="text" id="m-titre" placeholder="Ex: Envoie 50 messages"></div>
+    <div class="modal-field"><label>Description</label><input type="text" id="m-desc" placeholder="Ex: Sois actif dans les salons !"></div>
+    <div class="modal-field"><label>Type</label>
+      <select id="m-type" style="width:100%">
+        <option value="messages">💬 Messages envoyés</option>
+        <option value="xp">⭐ XP accumulée</option>
+        <option value="invitations">📨 Invitations</option>
+      </select>
+    </div>
+    <div class="modal-field"><label>Objectif</label><input type="number" id="m-objectif" placeholder="Ex: 50" style="width:100%"></div>
+    <div class="modal-field"><label>Récompense XP</label><input type="number" id="m-xp" placeholder="Ex: 200" style="width:100%"></div>
+    <div class="modal-field"><label>Rôle récompense (optionnel)</label><select id="m-role" style="width:100%"><option value="">Aucun</option></select></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-mission')">Annuler</button>
+      <button class="btn-add" onclick="submitMission()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+let token=null,me=null,currentGuild=null,config={},botData={};
+
+// ── INIT ──────────────────────────────────────
+async function init() {
+  const params = new URLSearchParams(location.search);
+  token = params.get("token") || getCookie("token");
+  if (!token) { showLogin(); return; }
+  if (params.get("token")) { history.replaceState({},""," /dashboard.html"); setCookie("token",token,7); }
+  try {
+    const res = await fetch(`${API}/me`,{headers:{Authorization:`Bearer ${token}`}});
+    if (!res.ok) { showLogin(); return; }
+    me = await res.json();
+    showGuilds();
+  } catch(e) { showLogin(); }
+}
+
+function showLogin(){ hide("guilds-page");hide("dashboard-page");show("login-page"); }
+
+function showGuilds(){
+  hide("login-page");hide("dashboard-page");show("guilds-page");
+  const u=me.user;
+  const av=u.avatar?`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`:`https://cdn.discordapp.com/embed/avatars/0.png`;
+  document.getElementById("g-avatar").src=av;
+  document.getElementById("g-username").textContent=u.username;
+  document.getElementById("g-tag").textContent=`ID : ${u.id}`;
+  const grid=document.getElementById("guilds-grid");
+  if(!me.guilds.length){
+    grid.innerHTML=`<div style="color:var(--text2);font-size:13px;grid-column:1/-1;padding:20px 0">Aucun serveur trouvé. Lance ton bot d'abord !</div>`;
+    return;
+  }
+  grid.innerHTML=me.guilds.map(g=>{
+    const icon=g.icon?`<img src="https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png" alt="">`:g.name.charAt(0).toUpperCase();
+    return `<div class="guild-card" onclick="openGuild('${g.id}','${g.name.replace(/'/g,"\\'")}','${g.icon||""}')">
+      <div class="guild-icon">${icon}</div>
+      <div><div class="guild-name">${g.name}</div><div class="guild-sub">Admin · Bot présent ✅</div></div>
+    </div>`;
+  }).join("");
+}
+
+async function openGuild(id,name,icon){
+  currentGuild={id,name,icon};
+  hide("guilds-page");show("dashboard-page");
+  const gi=document.getElementById("sb-guild-icon");
+  if(icon) gi.innerHTML=`<img src="https://cdn.discordapp.com/icons/${id}/${icon}.png" alt="">`;
+  else gi.textContent=name.charAt(0);
+  document.getElementById("sb-guild-name").textContent=name;
+  const u=me.user;
+  const av=u.avatar?`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`:`https://cdn.discordapp.com/embed/avatars/0.png`;
+  document.getElementById("sb-avatar").src=av;
+  document.getElementById("sb-name").textContent=u.username;
+  const [cfgRes,botRes]=await Promise.all([fetch(`${API}/config/${id}`),fetch(`${API}/bot/${id}`)]);
+  config=await cfgRes.json();
+  botData=await botRes.json();
+  nav("general",document.querySelector(".nav-item.active")||document.querySelector(".nav-item"));
+}
+
+function logout(){ deleteCookie("token");token=null;me=null;currentGuild=null;showLogin(); }
+
+// ── NAVIGATION ────────────────────────────────
+function nav(panel,btn){
+  document.querySelectorAll(".nav-item").forEach(b=>b.classList.remove("active"));
+  if(btn)btn.classList.add("active");
+  const titles={general:"⚙️ Général",logs:"📋 Logs",xp:"⭐ Niveaux & XP",shop:"🛒 Shop",
+    moderation:"🛡️ Modération",tickets:"🎫 Tickets",reaction_roles:"🎭 Reaction Roles",
+    missions:"🎯 Missions",membres:"👥 Membres",sanctions:"⚠️ Sanctions",
+    stats:"📊 Stats XP",historique:"🕓 Historique logs"};
+  document.getElementById("topbar-title").textContent=titles[panel]||panel;
+  const saveBtn=document.getElementById("save-btn");
+  const showSave=["general","logs","xp","shop","moderation","tickets"].includes(panel);
+  saveBtn.style.display=showSave?"":"none";
+  renderPanel(panel);
+}
+
+// ── SAVE ──────────────────────────────────────
+async function saveConfig(){
+  for(const [cle,valeur] of Object.entries(config)){
+    if(["roles_niveaux","shop","reaction_roles"].includes(cle)) continue;
+    await fetch(`${API}/config/${currentGuild.id}`,{
+      method:"PATCH",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({cle,valeur})
+    });
+  }
+  const btn=document.getElementById("save-btn");
+  btn.textContent="✓ Enregistré !";btn.classList.add("saved");
+  toast("✓ Configuration enregistrée !","green");
+  setTimeout(()=>{btn.textContent="Enregistrer";btn.classList.remove("saved");},2500);
+}
+
+// ── COMPOSANTS ────────────────────────────────
+function field(label,desc,control){
+  return `<div class="field-row"><div><div class="field-label">${label}</div>${desc?`<div class="field-desc">${desc}</div>`:""}</div><div>${control}</div></div>`;
+}
+function selectSalon(key){
+  const salons=botData.salons||[];
+  const val=config[key]||"";
+  const opts=salons.map(s=>`<option value="${s.id}"${val===s.id?" selected":""}>${s.name}</option>`).join("");
+  return `<select onchange="config['${key}']=this.value||null"><option value="">— Désactivé —</option>${opts}</select>`;
+}
+function selectCategorie(key){
+  const cats=botData.categories||[];
+  const val=config[key]||"";
+  const opts=cats.map(c=>`<option value="${c.id}"${val===c.id?" selected":""}>${c.name}</option>`).join("");
+  return `<select onchange="config['${key}']=this.value||null"><option value="">— Désactivé —</option>${opts}</select>`;
+}
+function selectRole(id,val="",onChange=""){
+  const roles=botData.roles||[];
+  const opts=roles.map(r=>`<option value="${r.name}"${val===r.name?" selected":""}>${r.name}</option>`).join("");
+  return `<select id="${id}" ${onChange?`onchange="${onChange}"`:""}><option value="">Choisir un rôle...</option>${opts}</select>`;
+}
+function num(key,min,max){
+  return `<input type="number" value="${config[key]||0}" min="${min}" max="${max}" onchange="config['${key}']=parseInt(this.value)">`;
+}
+function typeIcon(type){
+  return {modération:"🛡️",ban:"🔨",kick:"👢",warn:"⚠️",mute:"🔇",unmute:"🔊",messages:"💬",membres:"👥",vocal:"🎤",roles:"🎭",salons:"📁",pseudos:"✏️"}[type]||"📋";
+}
+function typeBadge(type){
+  if(["ban","kick"].includes(type)) return `<span class="badge badge-red">${typeIcon(type)} ${type}</span>`;
+  if(type==="warn") return `<span class="badge badge-yellow">⚠️ warn</span>`;
+  if(type==="mute") return `<span class="badge badge-blue">🔇 mute</span>`;
+  return `<span class="badge badge-green">${typeIcon(type)} ${type}</span>`;
+}
+
+// ── PANELS ────────────────────────────────────
+async function renderPanel(name){
+  const c=document.getElementById("content");
+  if(name==="stats"){
+    c.innerHTML=`<div style="color:var(--text2);font-size:13px;padding:20px 0">⏳ Chargement...</div>`;
+    const d=await (await fetch(`${API}/stats/${currentGuild.id}`)).json();
+    c.innerHTML=renderStats(d);
+  } else if(name==="historique"){
+    c.innerHTML=`<div style="color:var(--text2);font-size:13px;padding:20px 0">⏳ Chargement...</div>`;
+    const d=await (await fetch(`${API}/logs/${currentGuild.id}?limit=100`)).json();
+    c.innerHTML=renderHistorique(d);
+  } else if(name==="sanctions"){
+    c.innerHTML=`<div style="color:var(--text2);font-size:13px;padding:20px 0">⏳ Chargement...</div>`;
+    const d=await (await fetch(`${API}/sanctions/${currentGuild.id}`)).json();
+    c.innerHTML=renderSanctions(d);
+  } else if(name==="membres"){
+    c.innerHTML=`<div style="color:var(--text2);font-size:13px;padding:20px 0">⏳ Chargement...</div>`;
+    const d=await (await fetch(`${API}/membres/${currentGuild.id}`)).json();
+    c.innerHTML=renderMembres(d);
+  } else if(name==="missions"){
+    c.innerHTML=`<div style="color:var(--text2);font-size:13px;padding:20px 0">⏳ Chargement...</div>`;
+    const d=await (await fetch(`${API}/missions/${currentGuild.id}`)).json();
+    c.innerHTML=renderMissions(d);
+  } else if(name==="reaction_roles"){
+    c.innerHTML=renderReactionRoles();
+  } else {
+    const renders={general:renderGeneral,logs:renderLogs,xp:renderXP,shop:renderShop,moderation:renderModeration,tickets:renderTickets};
+    c.innerHTML=renders[name]();
+  }
+}
+
+function renderGeneral(){
+  return `<div class="panel-header"><h2>Général</h2><p>Salons principaux du serveur</p></div>
+  <div class="card"><div class="card-title">Salons</div>
+    ${field("Bienvenue","Message à l'arrivée d'un membre",selectSalon("salon_bienvenue"))}
+    ${field("Anniversaires","Souhaits automatiques",selectSalon("salon_anniversaire"))}
+    ${field("Suggestions","Suggestions des membres",selectSalon("salon_suggestions"))}
+  </div>`;
+}
+
+function renderLogs(){
+  const logs=[
+    ["logs_moderation","🛡️ Modération","Ban, kick, warn..."],
+    ["logs_messages","💬 Messages","Édition & suppression"],
+    ["logs_membres","👥 Membres","Arrivées & départs"],
+    ["logs_vocal","🎤 Vocal","Connexions vocales"],
+    ["logs_roles","🎭 Rôles","Ajout/retrait"],
+    ["logs_salons","📁 Salons","Création/suppression"],
+    ["logs_pseudos","✏️ Pseudos","Changements de pseudo"],
+  ];
+  return `<div class="panel-header"><h2>Logs</h2><p>Canaux de journalisation</p></div>
+  <div class="card"><div class="card-title">Canaux</div>${logs.map(([k,l,d])=>field(l,d,selectSalon(k))).join("")}</div>`;
+}
+
+function renderXP(){
+  const roles=config.roles_niveaux||{};
+  const tags=Object.entries(roles).sort((a,b)=>+a[0]-+b[0])
+    .map(([n,r])=>`<div class="tag"><span class="tag-level">Niv.${n}</span><span class="tag-name">${r}</span><button class="tag-del" onclick="delRole('${n}')">×</button></div>`).join("");
+  return `<div class="panel-header"><h2>Niveaux & XP</h2><p>Système d'expérience</p></div>
+  <div class="card"><div class="card-title">Paramètres</div>
+    ${field("XP par message","XP gagnée à chaque message",num("xp_par_message",1,100))}
+    ${field("Seuil anti-spam","Messages max en 5 secondes",num("seuil_anti_spam",2,20))}
+  </div>
+  <div class="card"><div class="card-title">Rôles par niveau</div>
+    <div class="add-row" style="padding-top:13px">
+      <input type="number" id="new-lvl" placeholder="Niveau" style="width:85px">
+      ${selectRole("new-role-select")}
+      <button class="btn-add" onclick="addRole()">Ajouter</button>
+    </div>
+    <div class="tags">${tags||'<span class="empty">Aucun rôle configuré</span>'}</div>
+  </div>`;
+}
+
+function renderShop(){
+  const shop=config.shop||{};
+  const items=Object.entries(shop).sort((a,b)=>a[1]-b[1]).map(([n,p])=>
+    `<div class="item-row">
+      <div class="item-row-left"><span>🎭</span><span style="font-size:13px;font-weight:500">${n}</span></div>
+      <div style="display:flex;align-items:center;gap:9px"><span class="badge badge-yellow">${p} XP</span><button class="btn-del" onclick="delItem('${n}')">Supprimer</button></div>
+    </div>`).join("");
+  return `<div class="panel-header"><h2>Shop</h2><p>Rôles achetables avec l'XP</p></div>
+  <div class="card"><div class="card-title">Articles</div>
+    <div class="add-row" style="padding-top:13px">
+      ${selectRole("new-shop-role")}
+      <input type="number" id="new-price" placeholder="Prix XP" style="width:95px">
+      <button class="btn-add green" onclick="addItem()">Ajouter</button>
+    </div>
+    <div class="item-list">${items||'<span class="empty" style="padding:0 0 6px;display:block">Aucun article</span>'}</div>
+  </div>`;
+}
+
+function renderModeration(){
+  return `<div class="panel-header"><h2>Modération</h2><p>Protection automatique</p></div>
+  <div class="card"><div class="card-title">Anti-spam</div>
+    ${field("Seuil anti-spam","Messages max en 5 secondes",num("seuil_anti_spam",2,20))}
+  </div>`;
+}
+
+function renderTickets(){
+  return `<div class="panel-header"><h2>Tickets</h2><p>Système de support</p></div>
+  <div class="card"><div class="card-title">Configuration</div>
+    ${field("Catégorie des tickets","Catégorie Discord pour les tickets",selectCategorie("categorie_tickets"))}
+  </div>`;
+}
+
+function renderReactionRoles(){
+  const rr=config.reaction_roles||{};
+  const items=Object.entries(rr).flatMap(([msgId,emojis])=>
+    Object.entries(emojis).map(([emoji,role])=>
+      `<div class="item-row">
+        <div class="item-row-left"><span style="font-size:20px">${emoji}</span>
+          <div><div style="font-size:13px;font-weight:500">${role}</div>
+          <div style="font-size:11px;color:var(--text3)">Message : ${msgId}</div></div>
+        </div>
+        <button class="btn-del" onclick="delReactionRole('${msgId}','${emoji}')">Supprimer</button>
+      </div>`
+    )
+  ).join("");
+  return `<div class="panel-header"><h2>Reaction Roles</h2><p>Attribue des rôles via les réactions</p></div>
+  <div class="card"><div class="card-title">Associations</div>
+    <div class="add-row" style="padding-top:13px">
+      <input type="text" id="rr-msgid" placeholder="ID du message" style="width:160px">
+      <input type="text" id="rr-emoji" placeholder="Emoji ex: 🎮" style="width:70px">
+      ${selectRole("rr-role")}
+      <button class="btn-add" onclick="addReactionRole()">Ajouter</button>
+    </div>
+    <div class="item-list">${items||'<span class="empty" style="padding:0 0 6px;display:block">Aucune association</span>'}</div>
+  </div>`;
+}
+
+function renderMissions(missions){
+  const typeLabel={messages:"💬 Messages",xp:"⭐ XP",invitations:"📨 Invitations"};
+  const typeColor={messages:"blue",xp:"yellow",invitations:"green"};
+  const items=missions.map(m=>
+    `<div class="mission-card">
+      <div class="mission-icon" style="background:var(--bg4)">${typeLabel[m.type]?.split(" ")[0]||"🎯"}</div>
+      <div class="mission-info">
+        <div class="mission-title">${m.titre}</div>
+        <div class="mission-desc">${m.description}</div>
+        <div class="mission-rewards">
+          <span class="badge badge-${typeColor[m.type]||"blue"}">${typeLabel[m.type]||m.type} · ${m.objectif}</span>
+          <span class="badge badge-yellow">+${m.recompense_xp} XP</span>
+          ${m.recompense_role?`<span class="badge badge-green">🎭 ${m.recompense_role}</span>`:""}
+        </div>
+      </div>
+      <button class="btn-del" onclick="delMission('${m.id}')">Supprimer</button>
+    </div>`
+  ).join("");
+
+  // Peupler le select de rôles dans la modal
+  setTimeout(()=>{
+    const sel=document.getElementById("m-role");
+    if(sel){
+      const roles=botData.roles||[];
+      sel.innerHTML=`<option value="">Aucun</option>`+roles.map(r=>`<option value="${r.name}">${r.name}</option>`).join("");
+    }
+  },50);
+
+  return `<div class="panel-header"><h2>Missions</h2><p>Défis et récompenses pour les membres</p></div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:4px">
+    <button class="btn-add" onclick="document.getElementById('modal-mission').style.display='flex'">➕ Nouvelle mission</button>
+  </div>
+  <div class="card"><div class="card-title">Missions actives</div>
+    <div style="display:flex;flex-direction:column;gap:8px;padding:14px 18px">
+      ${items||'<span class="empty">Aucune mission configurée</span>'}
+    </div>
+  </div>`;
+}
+
+function renderMembres(membres){
+  const rows=membres.map(m=>
+    `<div class="membre-card" onclick="voirProfil('${m.id}')">
+      <div class="membre-avatar">${m.avatar?`<img src="${m.avatar}" alt="">`:"👤"}</div>
+      <div class="membre-info" style="flex:1">
+        <div class="membre-name">${m.name}</div>
+        <div class="membre-sub">Niv.${m.niveau} · ${m.xp.toLocaleString()} XP ${m.sanctions>0?`· <span style="color:var(--red)">⚠️ ${m.sanctions} sanction(s)</span>`:""}</div>
+      </div>
+      <span style="font-size:11px;color:var(--text3)">→</span>
+    </div>`
+  ).join("");
+  return `<div class="panel-header"><h2>Membres</h2><p>Liste des membres du serveur · Clique pour voir le profil</p></div>
+  <div class="card">
+    <div class="search-bar" style="padding-bottom:10px">
+      <input type="text" placeholder="🔍 Rechercher un membre..." oninput="rechercherMembres(this.value)">
+    </div>
+    <div id="membres-list">${rows||'<div style="color:var(--text3);font-size:13px;padding:16px 18px">Aucun membre trouvé</div>'}</div>
+  </div>`;
+}
+
+async function rechercherMembres(q){
+  const res=await fetch(`${API}/membres/${currentGuild.id}?search=${encodeURIComponent(q)}`);
+  const membres=await res.json();
+  const rows=membres.map(m=>
+    `<div class="membre-card" onclick="voirProfil('${m.id}')">
+      <div class="membre-avatar">${m.avatar?`<img src="${m.avatar}" alt="">`:"👤"}</div>
+      <div style="flex:1"><div class="membre-name">${m.name}</div>
+      <div class="membre-sub">Niv.${m.niveau} · ${m.xp.toLocaleString()} XP ${m.sanctions>0?`· <span style="color:var(--red)">⚠️ ${m.sanctions}</span>`:""}</div></div>
+      <span style="font-size:11px;color:var(--text3)">→</span>
+    </div>`
+  ).join("");
+  document.getElementById("membres-list").innerHTML=rows||'<div style="color:var(--text3);font-size:13px;padding:16px 18px">Aucun résultat</div>';
+}
+
+async function voirProfil(userId){
+  const profil=await (await fetch(`${API}/profil/${currentGuild.id}/${userId}`)).json();
+  const avatar=profil.avatar?`<img src="${profil.avatar}" alt="" style="width:60px;height:60px;border-radius:50%;border:2px solid var(--border2)">`:`<div style="width:60px;height:60px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:28px">👤</div>`;
+  const sanctions=profil.sanctions.map((s,i)=>
+    `<div class="sanction-item">
+      <div class="sanction-type">${typeBadge(s.action)}</div>
+      <div class="sanction-info">
+        <div class="sanction-raison">${s.raison||"Aucune raison"}</div>
+        <div class="sanction-meta">Par ${s.moderateur_nom} · ${s.date}</div>
+      </div>
+      <button class="btn-del" onclick="supprimerSanctionProfil('${userId}',${i})">×</button>
+    </div>`
+  ).join("");
+  const roles=profil.roles.map(r=>`<span class="badge badge-blue">${r}</span>`).join(" ");
+  document.getElementById("modal-profil-content").innerHTML=`
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+      ${avatar}
+      <div>
+        <div style="font-size:18px;font-weight:700;color:#fff">${profil.name}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">ID : ${profil.id||userId}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Rejoint le ${profil.joined}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px">
+      <div class="stat-card"><div class="stat-label">Niveau</div><div class="stat-value">${profil.niveau}</div></div>
+      <div class="stat-card"><div class="stat-label">XP</div><div class="stat-value">${profil.xp.toLocaleString()}</div></div>
+      <div class="stat-card"><div class="stat-label">Warns</div><div class="stat-value" style="color:${profil.warnings>0?"var(--red)":"var(--green)"}">${profil.warnings}</div></div>
+    </div>
+    ${roles?`<div style="margin-bottom:18px"><div style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">RÔLES</div><div style="display:flex;flex-wrap:wrap;gap:6px">${roles}</div></div>`:""}
+    <div style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">SANCTIONS (${profil.sanctions.length})</div>
+    <div class="card">${sanctions||'<div style="color:var(--text3);font-size:13px;padding:14px 18px">Aucune sanction</div>'}</div>
+    <div class="modal-footer"><button class="btn-cancel" onclick="closeModal('modal-profil')">Fermer</button></div>`;
+  document.getElementById("modal-profil").style.display="flex";
+  document.getElementById("modal-profil").dataset.userId=userId;
+}
+
+async function supprimerSanctionProfil(userId,index){
+  await fetch(`${API}/sanctions/${currentGuild.id}/${userId}/${index}`,{method:"DELETE"});
+  toast("✓ Sanction supprimée !","green");
+  voirProfil(userId);
+}
+
+function renderSanctions(data){
+  if(!data.length) return `<div class="panel-header"><h2>Sanctions</h2><p>Historique des sanctions</p></div><div class="card"><div style="color:var(--text3);font-size:13px;padding:20px 18px">Aucune sanction enregistrée ✅</div></div>`;
+  const rows=data.map(m=>{
+    const avatar=m.avatar?`<img src="${m.avatar}" alt="">`:"👤";
+    const lastSanctions=m.sanctions.slice(-2).reverse().map(s=>typeBadge(s.action)).join(" ");
+    return `<div class="membre-card" onclick="voirProfil('${m.user_id}')">
+      <div class="membre-avatar">${avatar}</div>
+      <div style="flex:1"><div class="membre-name">${m.name}</div>
+      <div class="membre-sub">${lastSanctions}</div></div>
+      <span class="badge badge-red">${m.total} sanction(s)</span>
+    </div>`;
+  }).join("");
+  return `<div class="panel-header"><h2>Sanctions</h2><p>Clique sur un membre pour voir et gérer ses sanctions</p></div>
+  <div class="card" id="sanctions-list">${rows}</div>`;
+}
+
+function renderHistorique(logs){
+  if(!logs.length) return `<div class="panel-header"><h2>Historique</h2><p>Dernières actions enregistrées</p></div><div class="card"><div style="color:var(--text3);font-size:13px;padding:20px 18px">Aucun log disponible</div></div>`;
+  const rows=logs.map(l=>
+    `<div class="log-item">
+      <div class="log-icon" style="background:var(--bg3)">${typeIcon(l.type||"")}</div>
+      <div class="log-action">${l.action||l.message||JSON.stringify(l)}</div>
+      <div class="log-time">${l.date||""}</div>
+    </div>`
+  ).join("");
+  return `<div class="panel-header"><h2>Historique des logs</h2><p>100 dernières actions</p></div>
+  <div class="card">${rows}</div>`;
+}
+
+function renderStats(data){
+  const rc=i=>i===0?"gold":i===1?"silver":i===2?"bronze":"";
+  const top=data.top10.map((p,i)=>
+    `<div class="top-player">
+      <div class="rank ${rc(i)}">#${i+1}</div>
+      <div class="player-name" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2)">${p.user_id}</div>
+      <div class="player-xp">${p.xp.toLocaleString()} XP</div>
+      <div class="player-lvl">Niv.${p.niveau}</div>
+    </div>`).join("")||`<div style="color:var(--text3);font-size:13px;padding:16px 18px">Aucune donnée</div>`;
+  return `<div class="panel-header"><h2>Statistiques XP</h2><p>Classement du serveur</p></div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Membres actifs</div><div class="stat-value">${data.total_membres}</div><div class="stat-sub">ont gagné de l'XP</div></div>
+    <div class="stat-card"><div class="stat-label">XP total</div><div class="stat-value">${(data.total_xp||0).toLocaleString()}</div><div class="stat-sub">distribué</div></div>
+    <div class="stat-card"><div class="stat-label">Moy. / membre</div><div class="stat-value">${data.total_membres?Math.round(data.total_xp/data.total_membres):0}</div><div class="stat-sub">XP par membre</div></div>
+    <div class="stat-card"><div class="stat-label">Sanctions</div><div class="stat-value" style="color:var(--red)">${data.total_sanctions||0}</div><div class="stat-sub">au total</div></div>
+  </div>
+  <div class="card"><div class="card-title">Top 10 joueurs</div>${top}</div>`;
+}
+
+// ── ACTIONS ───────────────────────────────────
+async function addRole(){
+  const lvl=document.getElementById("new-lvl").value.trim();
+  const role=document.getElementById("new-role-select").value;
+  if(!lvl||!role) return;
+  await fetch(`${API}/config/${currentGuild.id}/roles`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({niveau:lvl,role})});
+  config.roles_niveaux[lvl]=role;
+  renderPanel("xp");
+}
+async function delRole(niveau){
+  await fetch(`${API}/config/${currentGuild.id}/roles/${niveau}`,{method:"DELETE"});
+  delete config.roles_niveaux[niveau];
+  renderPanel("xp");
+}
+async function addItem(){
+  const nom=document.getElementById("new-shop-role").value;
+  const prix=parseInt(document.getElementById("new-price").value);
+  if(!nom||isNaN(prix)||prix<=0) return;
+  await fetch(`${API}/config/${currentGuild.id}/shop`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nom,prix})});
+  config.shop[nom]=prix;
+  renderPanel("shop");
+}
+async function delItem(nom){
+  await fetch(`${API}/config/${currentGuild.id}/shop/${encodeURIComponent(nom)}`,{method:"DELETE"});
+  delete config.shop[nom];
+  renderPanel("shop");
+}
+async function addReactionRole(){
+  const msgId=document.getElementById("rr-msgid").value.trim();
+  const emoji=document.getElementById("rr-emoji").value.trim();
+  const role=document.getElementById("rr-role").value;
+  if(!msgId||!emoji||!role) return;
+  await fetch(`${API}/config/${currentGuild.id}/reaction_roles`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message_id:msgId,emoji,role})});
+  if(!config.reaction_roles) config.reaction_roles={};
+  if(!config.reaction_roles[msgId]) config.reaction_roles[msgId]={};
+  config.reaction_roles[msgId][emoji]=role;
+  renderPanel("reaction_roles");
+}
+async function delReactionRole(msgId,emoji){
+  await fetch(`${API}/config/${currentGuild.id}/reaction_roles/${msgId}/${encodeURIComponent(emoji)}`,{method:"DELETE"});
+  delete config.reaction_roles[msgId][emoji];
+  if(!Object.keys(config.reaction_roles[msgId]).length) delete config.reaction_roles[msgId];
+  renderPanel("reaction_roles");
+}
+async function submitMission(){
+  const titre=document.getElementById("m-titre").value.trim();
+  const desc=document.getElementById("m-desc").value.trim();
+  const type=document.getElementById("m-type").value;
+  const objectif=parseInt(document.getElementById("m-objectif").value);
+  const xp=parseInt(document.getElementById("m-xp").value);
+  const role=document.getElementById("m-role").value;
+  if(!titre||!desc||isNaN(objectif)||isNaN(xp)) return;
+  await fetch(`${API}/missions/${currentGuild.id}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({titre,description:desc,type,objectif,recompense_xp:xp,recompense_role:role||null})});
+  closeModal("modal-mission");
+  toast("✓ Mission ajoutée !","green");
+  renderPanel("missions");
+}
+async function delMission(id){
+  await fetch(`${API}/missions/${currentGuild.id}/${id}`,{method:"DELETE"});
+  toast("✓ Mission supprimée !","green");
+  renderPanel("missions");
+}
+
+// ── UTILS ─────────────────────────────────────
+function show(id){document.getElementById(id).style.display="";}
+function hide(id){document.getElementById(id).style.display="none";}
+function closeModal(id){document.getElementById(id).style.display="none";}
+function toast(msg,type="green"){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.className=`toast ${type==="red"?"error":""} show`;
+  setTimeout(()=>t.classList.remove("show"),2500);
+}
+function getCookie(n){return document.cookie.split(";").map(c=>c.trim()).find(c=>c.startsWith(n+"="))?.split("=")[1];}
+function setCookie(n,v,d){document.cookie=`${n}=${v};max-age=${d*86400};path=/`;}
+function deleteCookie(n){document.cookie=`${n}=;max-age=0;path=/`;}
+
+async function checkBotStatus() {
+  try {
+    const res = await fetch(`${API}/health`, { signal: AbortSignal.timeout(2000) });
+    const dot  = document.getElementById("status-dot");
+    const txt  = document.getElementById("status-text");
+    if (res.ok) {
+      dot.style.background = "var(--green)";
+      dot.style.boxShadow  = "0 0 8px var(--green)";
+      txt.textContent = "Bot en ligne";
+      txt.style.color = "var(--green)";
+    }
+  } catch(e) {
+    const dot = document.getElementById("status-dot");
+    const txt = document.getElementById("status-text");
+    dot.style.background = "var(--red)";
+    txt.textContent = "Bot hors ligne";
+    txt.style.color = "var(--red)";
+  }
+}
+setInterval(checkBotStatus, 10000);
+checkBotStatus();
+
+init();
+</script>
+</body>
+</html>
