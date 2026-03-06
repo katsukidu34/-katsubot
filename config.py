@@ -4,7 +4,6 @@ config.py — Constantes et gestion de la configuration
 
 import json
 import os
-import requests
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -14,20 +13,25 @@ load_dotenv()
 # TOKEN
 # ══════════════════════════════════════════════
 
-TOKEN = os.getenv('TOKEN')
+TOKEN = os.getenv("TOKEN")
 
 # ══════════════════════════════════════════════
-# API
+# DOSSIER DE DONNÉES PERSISTANT
 # ══════════════════════════════════════════════
 
-API = "http://127.0.0.1:8000"
+# Sur Railway → /app/data, en local → dossier courant
+DATA_DIR = "/app/data" if os.path.exists("/app") else "."
+os.makedirs(DATA_DIR, exist_ok=True)
 
 # ══════════════════════════════════════════════
 # FICHIERS DE DONNÉES
 # ══════════════════════════════════════════════
 
-FICHIER_DATA   = "data.json"
-FICHIER_CONFIG = "config.json"
+FICHIER_DATA     = os.path.join(DATA_DIR, "data.json")
+FICHIER_CONFIG   = os.path.join(DATA_DIR, "config.json")
+FICHIER_BOT_DATA = os.path.join(DATA_DIR, "bot_data.json")
+FICHIER_LOGS     = os.path.join(DATA_DIR, "logs.json")
+FICHIER_MISSIONS = os.path.join(DATA_DIR, "missions.json")
 
 # ══════════════════════════════════════════════
 # CONFIGURATION PAR DÉFAUT
@@ -59,13 +63,13 @@ CONFIG_DEFAUT = {
 
 def charger_data() -> dict:
     if os.path.exists(FICHIER_DATA):
-        with open(FICHIER_DATA, "r") as f:
+        with open(FICHIER_DATA, "r", encoding="utf-8") as f:
             return json.load(f)
     return {}
 
 def sauvegarder_data(data: dict):
-    with open(FICHIER_DATA, "w") as f:
-        json.dump(data, f, indent=4)
+    with open(FICHIER_DATA, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
 
 def get_joueur(data: dict, guild_id: int, user_id: int) -> dict:
     gid, uid = str(guild_id), str(user_id)
@@ -107,21 +111,15 @@ def get_sanctions(guild_id: int, user_id: int) -> list:
 
 def charger_config() -> dict:
     if os.path.exists(FICHIER_CONFIG):
-        with open(FICHIER_CONFIG, "r") as f:
+        with open(FICHIER_CONFIG, "r", encoding="utf-8") as f:
             return json.load(f)
     return {}
 
 def sauvegarder_config(config: dict):
-    with open(FICHIER_CONFIG, "w") as f:
-        json.dump(config, f, indent=4)
+    with open(FICHIER_CONFIG, "w", encoding="utf-8") as f:
+        json.dump(config, f, indent=4, ensure_ascii=False)
 
 def get_config(guild_id: int) -> dict:
-    try:
-        res = requests.get(f"{API}/config/{guild_id}", timeout=2)
-        if res.status_code == 200:
-            return res.json()
-    except Exception:
-        pass
     config = charger_config()
     gid    = str(guild_id)
     if gid not in config:
@@ -133,16 +131,6 @@ def get_config(guild_id: int) -> dict:
     return config[gid]
 
 def set_config(guild_id: int, cle: str, valeur):
-    try:
-        res = requests.patch(
-            f"{API}/config/{guild_id}",
-            json={"cle": cle, "valeur": valeur},
-            timeout=2
-        )
-        if res.status_code == 200:
-            return
-    except Exception:
-        pass
     config = charger_config()
     gid    = str(guild_id)
     if gid not in config:
