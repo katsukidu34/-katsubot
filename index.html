@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KatsuBot — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #07080f;
+  --bg2:      #0c0e1a;
+  --bg3:      #111428;
+  --bg4:      #161a32;
+  --border:   #1a1e38;
+  --border2:  #222744;
+  --text:     #e8ecff;
+  --text2:    #5a6080;
+  --text3:    #2e3255;
+  --accent:   #4f6ef7;
+  --accent2:  #6b4fe8;
+  --green:    #2ecc8f;
+  --red:      #e84f5a;
+  --yellow:   #f0c040;
+  --orange:   #f07840;
+  --font:     'Syne', sans-serif;
+  --mono:     'JetBrains Mono', monospace;
+  --radius:   10px;
+  --glow:     0 0 30px #4f6ef720;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;}
+::selection{background:#4f6ef740;color:#fff;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ── NOISE OVERLAY ─────────────────────────── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:.4;
+}
+
+/* ── LOGIN ─────────────────────────────────── */
+#login-page{
+  position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 30%, #4f6ef710 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 20% 80%, #6b4fe808 0%, transparent 60%),
+    var(--bg);
+}
+.login-card{
+  text-align:center;padding:56px 52px;
+  background:linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+  border:1px solid var(--border2);border-radius:20px;
+  max-width:420px;width:90%;
+  box-shadow:0 40px 100px #00000060, inset 0 1px 0 #ffffff08;
+  position:relative;overflow:hidden;
+}
+.login-card::before{
+  content:'';position:absolute;top:-1px;left:15%;right:15%;height:1px;
+  background:linear-gradient(90deg,transparent,#4f6ef760,transparent);
+}
+.login-logo{
+  width:68px;height:68px;border-radius:20px;margin:0 auto 24px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-size:32px;
+  box-shadow:0 8px 40px #4f6ef740, inset 0 1px 0 #ffffff20;
+}
+.login-title{font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.5px;}
+.login-title span{color:var(--accent);}
+.login-sub{color:var(--text2);font-size:14px;margin:12px 0 36px;line-height:1.7;}
+.login-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,#5865F2,#4752c4);
+  border:none;border-radius:12px;padding:14px 30px;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;
+  font-family:var(--font);text-decoration:none;
+  transition:all .25s;
+  box-shadow:0 4px 24px #5865F240;
+}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px #5865F260;}
+.login-btn svg{width:20px;height:20px;}
+
+/* ── GUILDS ────────────────────────────────── */
+#guilds-page{position:relative;z-index:1;min-height:100vh;padding:48px 28px;}
+.guilds-topbar{max-width:920px;margin:0 auto 40px;display:flex;align-items:center;justify-content:space-between;}
+.user-info{display:flex;align-items:center;gap:14px;}
+.user-avatar{width:44px;height:44px;border-radius:50%;border:2px solid var(--border2);}
+.user-name{font-weight:700;font-size:15px;color:#fff;}
+.user-tag{font-size:12px;color:var(--text2);font-family:var(--mono);margin-top:2px;}
+.btn-outline{
+  background:transparent;border:1px solid var(--border2);border-radius:9px;
+  padding:8px 16px;color:var(--text2);cursor:pointer;font-family:var(--font);font-size:13px;
+  transition:all .15s;
+}
+.btn-outline:hover{border-color:var(--accent);color:var(--text);}
+.guilds-title{font-size:32px;font-weight:800;color:#fff;letter-spacing:-0.8px;max-width:920px;margin:0 auto 6px;}
+.guilds-sub{font-size:14px;color:var(--text2);max-width:920px;margin:0 auto 28px;}
+.guilds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;max-width:920px;margin:0 auto;}
+.guild-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:14px;
+  padding:20px;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:14px;
+  position:relative;overflow:hidden;
+}
+.guild-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#4f6ef708,transparent);opacity:0;transition:opacity .2s;}
+.guild-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 12px 40px #00000040,var(--glow);}
+.guild-card:hover::after{opacity:1;}
+.guild-icon{
+  width:52px;height:52px;border-radius:14px;
+  background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:800;color:var(--accent);flex-shrink:0;overflow:hidden;
+}
+.guild-icon img{width:100%;height:100%;object-fit:cover;border-radius:14px;}
+.guild-name{font-weight:700;font-size:14px;color:#fff;}
+.guild-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;color:var(--green);margin-top:4px;
+  font-family:var(--mono);
+}
+.guild-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
+
+/* ── DASHBOARD LAYOUT ──────────────────────── */
+#dashboard-page{display:flex;min-height:100vh;position:relative;z-index:1;}
+
+/* ── SIDEBAR ───────────────────────────────── */
+.sidebar{
+  width:216px;min-height:100vh;
+  background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;
+  padding:18px 10px;gap:1px;overflow-y:auto;
+}
+.sidebar-logo{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 8px 18px;border-bottom:1px solid var(--border);margin-bottom:10px;
+}
+.logo-mark{
+  width:34px;height:34px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+  box-shadow:0 4px 20px #4f6ef730;
+}
+.logo-text{font-weight:800;font-size:15px;color:#fff;letter-spacing:-0.3px;}
+.logo-ver{font-size:10px;color:var(--text3);font-family:var(--mono);}
+
+.guild-switcher{
+  margin:0 2px 8px;padding:9px 10px;
+  background:var(--bg3);border:1px solid var(--border2);border-radius:9px;
+  cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .15s;
+}
+.guild-switcher:hover{border-color:var(--accent);}
+.gs-icon{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--bg4);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:var(--accent);flex-shrink:0;overflow:hidden;
+}
+.gs-icon img{width:100%;height:100%;object-fit:cover;border-radius:8px;}
+.gs-name{font-size:12px;font-weight:600;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gs-arr{color:var(--text3);font-size:9px;}
+
+.nav-section{font-size:9px;letter-spacing:2px;color:var(--text3);font-weight:700;padding:10px 10px 3px;text-transform:uppercase;}
+.nav-item{
+  display:flex;align-items:center;gap:9px;padding:8px 10px;
+  border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;
+  color:var(--text2);border:1px solid transparent;
+  transition:all .12s;background:none;width:100%;text-align:left;font-family:var(--font);
+}
+.nav-item:hover{color:var(--text);background:var(--bg3);}
+.nav-item.active{color:var(--accent);background:#4f6ef710;border-color:#4f6ef720;}
+.nav-item .ni{font-size:15px;width:18px;text-align:center;flex-shrink:0;}
+
+.sidebar-user{
+  margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:9px;
+}
+.su-av{width:30px;height:30px;border-radius:50%;flex-shrink:0;}
+.su-name{font-size:12px;font-weight:600;color:var(--text2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.su-out{
+  background:none;border:none;color:var(--text3);cursor:pointer;
+  font-size:14px;padding:4px;border-radius:6px;transition:color .15s;
+}
+.su-out:hover{color:var(--red);}
+
+/* ── MAIN ──────────────────────────────────── */
+.main{margin-left:216px;flex:1;display:flex;flex-direction:column;}
+.topbar{
+  height:54px;padding:0 26px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(12,14,26,.85);backdrop-filter:blur(12px);
+  position:sticky;top:0;z-index:50;
+}
+.topbar-title{font-weight:800;font-size:15px;color:#fff;letter-spacing:-0.2px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.status-pill{
+  display:flex;align-items:center;gap:7px;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:8px;padding:6px 12px;font-size:12px;color:var(--text2);font-family:var(--mono);
+}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);flex-shrink:0;}
+.save-btn{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:9px;padding:8px 20px;
+  color:#fff;font-weight:700;font-size:13px;cursor:pointer;
+  font-family:var(--font);transition:all .2s;
+  box-shadow:0 2px 16px #4f6ef730;
+}
+.save-btn:hover{transform:translateY(-1px);box-shadow:0 4px 24px #4f6ef750;}
+.save-btn.saved{background:linear-gradient(135deg,var(--green),#27a877);}
+
+/* ── CONTENT ───────────────────────────────── */
+.content{padding:28px;display:flex;flex-direction:column;gap:20px;max-width:860px;}
+.panel-hd{margin-bottom:4px;}
+.panel-hd h2{font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px;}
+.panel-hd p{font-size:13px;color:var(--text2);margin-top:5px;}
+
+/* ── CARDS ─────────────────────────────────── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.card-head{font-size:9px;letter-spacing:2px;color:var(--text3);font-weight:700;text-transform:uppercase;padding:14px 18px 0;}
+
+/* ── FIELD ROWS ────────────────────────────── */
+.field{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 18px;border-bottom:1px solid var(--border);}
+.field:last-child{border-bottom:none;}
+.fl{font-size:13px;font-weight:600;color:var(--text);}
+.fd{font-size:11px;color:var(--text3);margin-top:3px;}
+
+/* ── INPUTS ────────────────────────────────── */
+select,input[type=text],input[type=number]{
+  background:var(--bg3);border:1.5px solid var(--border2);
+  border-radius:8px;padding:7px 11px;
+  color:var(--text);font-family:var(--font);font-size:13px;
+  outline:none;transition:border-color .2s;
+}
+select:focus,input:focus{border-color:var(--accent);}
+select option{background:var(--bg3);color:var(--text);}
+select{min-width:185px;cursor:pointer;}
+input[type=number]{width:78px;font-family:var(--mono);}
+input[type=text]{min-width:160px;}
+
+/* ── TOGGLE ────────────────────────────────── */
+.toggle{position:relative;width:42px;height:23px;cursor:pointer;}
+.toggle input{opacity:0;width:0;height:0;}
+.tslider{position:absolute;inset:0;border-radius:12px;background:var(--bg3);border:1.5px solid var(--border2);transition:all .22s;}
+.tslider::before{content:'';position:absolute;width:15px;height:15px;border-radius:50%;background:var(--text3);top:2px;left:2px;transition:all .22s;}
+.toggle input:checked+.tslider{border-color:var(--accent);background:#4f6ef715;}
+.toggle input:checked+.tslider::before{background:var(--accent);transform:translateX(19px);box-shadow:0 0 10px #4f6ef780;}
+
+/* ── TAGS ──────────────────────────────────── */
+.tags{display:flex;flex-wrap:wrap;gap:7px;padding:0 18px 16px;}
+.tag{
+  display:flex;align-items:center;gap:7px;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:7px;padding:5px 10px;font-size:12px;
+}
+.tag-lvl{color:var(--accent);font-family:var(--mono);font-weight:600;}
+.tag-nm{color:var(--text2);}
+.tag-x{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;line-height:1;padding:0;transition:color .15s;}
+.tag-x:hover{color:var(--red);}
+
+/* ── ADD ROW ───────────────────────────────── */
+.add-row{display:flex;gap:8px;padding:0 18px 16px;flex-wrap:wrap;align-items:center;}
+.add-row input{flex:1;min-width:90px;}
+.add-row.top{padding-top:14px;}
+.btn{
+  border:none;border-radius:8px;padding:8px 16px;
+  color:#fff;font-weight:700;font-size:12px;cursor:pointer;
+  font-family:var(--font);transition:all .15s;white-space:nowrap;
+}
+.btn-blue{background:var(--accent);}.btn-blue:hover{background:#3d5de8;}
+.btn-green{background:var(--green);color:#051a0e;}.btn-green:hover{background:#25b07a;}
+.btn-red{background:var(--red);}.btn-red:hover{background:#c93e48;}
+.btn-sm{padding:5px 11px;font-size:11px;}
+
+/* ── ITEM LIST ─────────────────────────────── */
+.item-list{display:flex;flex-direction:column;gap:8px;padding:0 18px 16px;}
+.item-row{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:9px;padding:11px 14px;
+}
+.item-left{display:flex;align-items:center;gap:10px;}
+.item-name{font-size:13px;font-weight:600;color:var(--text);}
+.item-sub{font-size:11px;color:var(--text3);margin-top:2px;font-family:var(--mono);}
+
+/* ── BADGES ────────────────────────────────── */
+.badge{font-family:var(--mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:6px;}
+.b-yellow{background:#f0c04018;color:var(--yellow);border:1px solid #f0c04028;}
+.b-red{background:#e84f5a18;color:var(--red);border:1px solid #e84f5a28;}
+.b-green{background:#2ecc8f18;color:var(--green);border:1px solid #2ecc8f28;}
+.b-blue{background:#4f6ef718;color:var(--accent);border:1px solid #4f6ef728;}
+.b-orange{background:#f0784018;color:var(--orange);border:1px solid #f0784028;}
+
+/* ── STATS GRID ────────────────────────────── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.stat-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px 20px;position:relative;overflow:hidden;
+}
+.stat-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  opacity:0;transition:opacity .2s;
+}
+.stat-card:hover::after{opacity:1;}
+.stat-label{font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+.stat-value{font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px;font-family:var(--mono);}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* ── TOP PLAYERS ───────────────────────────── */
+.top-row{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--border);}
+.top-row:last-child{border-bottom:none;}
+.rank{width:24px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text3);flex-shrink:0;font-weight:600;}
+.rank.gold{color:var(--yellow);}
+.rank.silver{color:#aab0c0;}
+.rank.bronze{color:var(--orange);}
+.p-name{flex:1;font-size:13px;font-weight:600;color:var(--text);}
+.p-xp{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent);}
+.p-lvl{font-family:var(--mono);font-size:11px;color:var(--text3);margin-left:10px;}
+
+/* ── MEMBRES ───────────────────────────────── */
+.membre-row{
+  display:flex;align-items:center;gap:12px;padding:12px 18px;
+  border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;
+}
+.membre-row:last-child{border-bottom:none;}
+.membre-row:hover{background:var(--bg3);}
+.m-av{width:36px;height:36px;border-radius:50%;background:var(--bg3);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.m-av img{width:100%;height:100%;object-fit:cover;}
+.m-name{font-size:13px;font-weight:600;color:var(--text);}
+.m-sub{font-size:11px;color:var(--text2);margin-top:2px;font-family:var(--mono);}
+.m-arr{font-size:11px;color:var(--text3);}
+
+/* ── SANCTIONS ─────────────────────────────── */
+.san-row{display:flex;align-items:flex-start;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);}
+.san-row:last-child{border-bottom:none;}
+.san-info{flex:1;}
+.san-raison{font-size:13px;color:var(--text);}
+.san-meta{font-size:11px;color:var(--text3);margin-top:3px;font-family:var(--mono);}
+
+/* ── LOGS ──────────────────────────────────── */
+.log-row{display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--border);}
+.log-row:last-child{border-bottom:none;}
+.log-ico{width:30px;height:30px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.log-txt{flex:1;font-size:13px;color:var(--text);}
+.log-time{font-family:var(--mono);font-size:11px;color:var(--text3);}
+
+/* ── MISSIONS ──────────────────────────────── */
+.mission-card{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:10px;padding:16px;
+  display:flex;align-items:center;gap:14px;
+}
+.mission-ico{
+  width:40px;height:40px;border-radius:10px;background:var(--bg4);
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+}
+.mission-title{font-size:13px;font-weight:700;color:#fff;}
+.mission-desc{font-size:11px;color:var(--text2);margin-top:3px;}
+.mission-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+
+/* ── SEARCH ────────────────────────────────── */
+.search-wrap{padding:14px 18px 0;}
+.search-wrap input{
+  width:100%;background:var(--bg3);border:1.5px solid var(--border2);
+  border-radius:8px;padding:9px 14px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;
+}
+.search-wrap input:focus{border-color:var(--accent);}
+
+/* ── MODAL ─────────────────────────────────── */
+.modal-ov{
+  position:fixed;inset:0;background:#00000090;backdrop-filter:blur(4px);
+  z-index:200;display:flex;align-items:center;justify-content:center;
+}
+.modal{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:16px;padding:30px;width:90%;max-width:500px;
+  max-height:88vh;overflow-y:auto;
+  box-shadow:0 40px 100px #00000080;
+  position:relative;
+}
+.modal::before{
+  content:'';position:absolute;top:-1px;left:20%;right:20%;height:1px;
+  background:linear-gradient(90deg,transparent,#4f6ef760,transparent);
+}
+.modal h3{font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:22px;}
+.mf{margin-bottom:16px;}
+.mf label{display:block;font-size:11px;font-weight:700;color:var(--text2);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:7px;}
+.mf input,.mf select{width:100%;}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
+.btn-cancel{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:8px;
+  padding:9px 18px;color:var(--text2);cursor:pointer;font-family:var(--font);font-size:13px;
+  transition:all .15s;
+}
+.btn-cancel:hover{border-color:var(--border);color:var(--text);}
+
+/* ── PROFIL MODAL ──────────────────────────── */
+.profil-top{display:flex;align-items:center;gap:18px;margin-bottom:22px;}
+.profil-av{width:64px;height:64px;border-radius:50%;border:2px solid var(--border2);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:30px;background:var(--bg3);flex-shrink:0;}
+.profil-av img{width:100%;height:100%;object-fit:cover;}
+.profil-name{font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.4px;}
+.profil-id{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:3px;}
+.profil-join{font-size:12px;color:var(--text2);margin-top:5px;}
+.profil-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.ps-card{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:14px 16px;}
+.ps-label{font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+.ps-val{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+.profil-section{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+.roles-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+
+/* ── TOAST ─────────────────────────────────── */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  padding:11px 20px;border-radius:10px;
+  font-weight:700;font-size:13px;
+  opacity:0;transform:translateY(8px);
+  transition:all .25s;pointer-events:none;z-index:999;
+}
+.toast.green{background:var(--green);color:#051a0e;box-shadow:0 4px 24px #2ecc8f40;}
+.toast.error{background:var(--red);color:#fff;box-shadow:0 4px 24px #e84f5a40;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* ── EMPTY ─────────────────────────────────── */
+.empty{color:var(--text3);font-size:13px;padding:6px 0;}
+
+/* ── ANIM ──────────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.content>*{animation:fadeUp .18s ease both;}
+.content>*:nth-child(2){animation-delay:.04s;}
+.content>*:nth-child(3){animation-delay:.08s;}
+.content>*:nth-child(4){animation-delay:.12s;}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══════════════════════════════════════ -->
+<div id="login-page" style="display:none">
+  <div class="login-card">
+    <div class="login-logo">⚡</div>
+    <div class="login-title">Katsu<span>Bot</span></div>
+    <div class="login-sub">Connecte-toi avec Discord pour gérer ton bot depuis le dashboard.</div>
+    <a class="login-btn" href="http://localhost:8000/login">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      Se connecter avec Discord
+    </a>
+  </div>
+</div>
+
+<!-- ══ GUILDS ══════════════════════════════════════ -->
+<div id="guilds-page" style="display:none">
+  <div class="guilds-topbar">
+    <div class="user-info">
+      <img class="user-avatar" id="g-avatar" src="" alt="">
+      <div>
+        <div class="user-name" id="g-username"></div>
+        <div class="user-tag" id="g-tag"></div>
+      </div>
+    </div>
+    <button class="btn-outline" onclick="logout()">Se déconnecter</button>
+  </div>
+  <div class="guilds-title">Choisis un serveur</div>
+  <div class="guilds-sub">Seuls les serveurs où le bot est présent et où tu es admin sont affichés.</div>
+  <div class="guilds-grid" id="guilds-grid"></div>
+</div>
+
+<!-- ══ DASHBOARD ════════════════════════════════════ -->
+<div id="dashboard-page" style="display:none">
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">⚡</div>
+      <div>
+        <div class="logo-text">KatsuBot</div>
+        <div class="logo-ver">v4.0 dashboard</div>
+      </div>
+    </div>
+    <div class="guild-switcher" onclick="showGuilds()">
+      <div class="gs-icon" id="sb-guild-icon"></div>
+      <div class="gs-name" id="sb-guild-name">Serveur</div>
+      <div class="gs-arr">▾</div>
+    </div>
+    <div class="nav-section">Configuration</div>
+    <button class="nav-item active" onclick="nav('general',this)"><span class="ni">⚙️</span>Général</button>
+    <button class="nav-item" onclick="nav('logs',this)"><span class="ni">📋</span>Logs</button>
+    <button class="nav-item" onclick="nav('xp',this)"><span class="ni">⭐</span>Niveaux & XP</button>
+    <button class="nav-item" onclick="nav('shop',this)"><span class="ni">🛒</span>Shop</button>
+    <button class="nav-item" onclick="nav('moderation',this)"><span class="ni">🛡️</span>Modération</button>
+    <button class="nav-item" onclick="nav('tickets',this)"><span class="ni">🎫</span>Tickets</button>
+    <button class="nav-item" onclick="nav('reaction_roles',this)"><span class="ni">🎭</span>Reaction Roles</button>
+    <button class="nav-item" onclick="nav('missions',this)"><span class="ni">🎯</span>Missions</button>
+    <div class="nav-section" style="margin-top:6px">Membres</div>
+    <button class="nav-item" onclick="nav('membres',this)"><span class="ni">👥</span>Membres</button>
+    <button class="nav-item" onclick="nav('sanctions',this)"><span class="ni">⚠️</span>Sanctions</button>
+    <div class="nav-section" style="margin-top:6px">Statistiques</div>
+    <button class="nav-item" onclick="nav('stats',this)"><span class="ni">📊</span>Stats XP</button>
+    <button class="nav-item" onclick="nav('historique',this)"><span class="ni">🕓</span>Historique</button>
+    <div class="sidebar-user">
+      <img class="su-av" id="sb-avatar" src="" alt="">
+      <div class="su-name" id="sb-name"></div>
+      <button class="su-out" onclick="logout()" title="Déconnexion">⏏</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title" id="topbar-title">⚙️ Général</div>
+      <div class="topbar-right">
+        <div class="status-pill"><div class="status-dot"></div><span id="guild-label">—</span></div>
+        <button class="save-btn" id="save-btn" onclick="saveConfig()">Enregistrer</button>
+      </div>
+    </header>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL PROFIL ══════════════════════════════════ -->
+<div id="modal-profil" class="modal-ov" style="display:none" onclick="if(event.target===this)closeModal('modal-profil')">
+  <div class="modal" id="modal-profil-content"></div>
+</div>
+
+<!-- ══ MODAL MISSION ═════════════════════════════════ -->
+<div id="modal-mission" class="modal-ov" style="display:none" onclick="if(event.target===this)closeModal('modal-mission')">
+  <div class="modal">
+    <h3>➕ Nouvelle mission</h3>
+    <div class="mf"><label>Titre</label><input type="text" id="m-titre" placeholder="Ex: Envoie 50 messages"></div>
+    <div class="mf"><label>Description</label><input type="text" id="m-desc" placeholder="Décris l'objectif..."></div>
+    <div class="mf"><label>Type</label>
+      <select id="m-type" style="width:100%">
+        <option value="messages">💬 Messages envoyés</option>
+        <option value="xp">⭐ XP accumulée</option>
+        <option value="invitations">📨 Invitations</option>
+      </select>
+    </div>
+    <div class="mf"><label>Objectif</label><input type="number" id="m-objectif" placeholder="Ex: 50" style="width:100%"></div>
+    <div class="mf"><label>Récompense XP</label><input type="number" id="m-xp" placeholder="Ex: 200" style="width:100%"></div>
+    <div class="mf"><label>Rôle récompense (optionnel)</label><select id="m-role" style="width:100%"><option value="">Aucun</option></select></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-mission')">Annuler</button>
+      <button class="btn btn-blue" onclick="submitMission()">Ajouter la mission</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+let token=null, me=null, currentGuild=null, config={}, botData={};
+
+// ── INIT ──────────────────────────────────────────────
+async function init() {
+  const params = new URLSearchParams(location.search);
+  token = params.get("token") || getCookie("token");
+  if (!token) { showLogin(); return; }
+  if (params.get("token")) { history.replaceState({}, "", "/dashboard.html"); setCookie("token", token, 7); }
+  try {
+    const res = await fetch(`${API}/me`, { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) { showLogin(); return; }
+    me = await res.json();
+    showGuilds();
+  } catch(e) { showLogin(); }
+}
+
+function showLogin() { hide("guilds-page"); hide("dashboard-page"); show("login-page"); }
+
+function showGuilds() {
+  hide("login-page"); hide("dashboard-page"); show("guilds-page");
+  const u = me.user;
+  const av = u.avatar ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png` : `https://cdn.discordapp.com/embed/avatars/0.png`;
+  document.getElementById("g-avatar").src = av;
+  document.getElementById("g-username").textContent = u.username;
+  document.getElementById("g-tag").textContent = `ID : ${u.id}`;
+  const grid = document.getElementById("guilds-grid");
+  if (!me.guilds.length) {
+    grid.innerHTML = `<div style="color:var(--text2);font-size:13px;grid-column:1/-1;padding:20px 0">Aucun serveur trouvé. Vérifie que le bot est bien invité !</div>`;
+    return;
+  }
+  grid.innerHTML = me.guilds.map(g => {
+    const iconUrl = g.icon_url || (g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png` : null);
+    const icon = iconUrl ? `<img src="${iconUrl}" alt="">` : g.name.charAt(0).toUpperCase();
+    const members = g.members ? ` · ${g.members} membres` : "";
+    return `<div class="guild-card" onclick="openGuild('${g.id}','${g.name.replace(/'/g,"\\'")}','${g.icon||""}')">
+      <div class="guild-icon">${icon}</div>
+      <div><div class="guild-name">${g.name}</div><div class="guild-badge">Bot présent${members}</div></div>
+    </div>`;
+  }).join("");
+}
+
+async function openGuild(id, name, icon) {
+  currentGuild = { id, name, icon };
+  hide("guilds-page"); show("dashboard-page");
+  const gi = document.getElementById("sb-guild-icon");
+  if (icon) gi.innerHTML = `<img src="https://cdn.discordapp.com/icons/${id}/${icon}.png" alt="">`;
+  else gi.textContent = name.charAt(0);
+  document.getElementById("sb-guild-name").textContent = name;
+  document.getElementById("guild-label").textContent = name;
+  const u = me.user;
+  const av = u.avatar ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png` : `https://cdn.discordapp.com/embed/avatars/0.png`;
+  document.getElementById("sb-avatar").src = av;
+  document.getElementById("sb-name").textContent = u.username;
+  const [cfgRes, botRes] = await Promise.all([
+    fetch(`${API}/config/${id}`),
+    fetch(`${API}/bot/${id}`)
+  ]);
+  config = await cfgRes.json();
+  botData = await botRes.json();
+  nav("general", document.querySelector(".nav-item.active") || document.querySelector(".nav-item"));
+}
+
+function logout() { deleteCookie("token"); token=null; me=null; currentGuild=null; showLogin(); }
+
+// ── NAV ───────────────────────────────────────────────
+function nav(panel, btn) {
+  document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  const titles = {
+    general:"⚙️ Général", logs:"📋 Logs", xp:"⭐ Niveaux & XP", shop:"🛒 Shop",
+    moderation:"🛡️ Modération", tickets:"🎫 Tickets", reaction_roles:"🎭 Reaction Roles",
+    missions:"🎯 Missions", membres:"👥 Membres", sanctions:"⚠️ Sanctions",
+    stats:"📊 Stats XP", historique:"🕓 Historique"
+  };
+  document.getElementById("topbar-title").textContent = titles[panel] || panel;
+  const showSave = ["general","logs","xp","shop","moderation","tickets"].includes(panel);
+  document.getElementById("save-btn").style.display = showSave ? "" : "none";
+  renderPanel(panel);
+}
+
+// ── SAVE ──────────────────────────────────────────────
+async function saveConfig() {
+  for (const [cle, valeur] of Object.entries(config)) {
+    if (["roles_niveaux","shop","reaction_roles"].includes(cle)) continue;
+    await fetch(`${API}/config/${currentGuild.id}`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cle, valeur })
+    });
+  }
+  const btn = document.getElementById("save-btn");
+  btn.textContent = "✓ Enregistré !"; btn.classList.add("saved");
+  toast("Configuration enregistrée !", "green");
+  setTimeout(() => { btn.textContent = "Enregistrer"; btn.classList.remove("saved"); }, 2500);
+}
+
+// ── COMPOSANTS ────────────────────────────────────────
+function field(label, desc, control) {
+  return `<div class="field"><div><div class="fl">${label}</div>${desc ? `<div class="fd">${desc}</div>` : ""}</div><div>${control}</div></div>`;
+}
+function selectSalon(key) {
+  const salons = botData.salons || [];
+  const val = config[key] || "";
+  const opts = salons.map(s => `<option value="${s.id}"${val===s.id?" selected":""}>#${s.name}</option>`).join("");
+  return `<select onchange="config['${key}']=this.value||null"><option value="">— Désactivé —</option>${opts}</select>`;
+}
+function selectCategorie(key) {
+  const cats = botData.categories || [];
+  const val = config[key] || "";
+  const opts = cats.map(c => `<option value="${c.id}"${val===c.id?" selected":""}>📁 ${c.name}</option>`).join("");
+  return `<select onchange="config['${key}']=this.value||null"><option value="">— Désactivé —</option>${opts}</select>`;
+}
+function selectRole(id, val="") {
+  const roles = botData.roles || [];
+  const opts = roles.map(r => `<option value="${r.name}"${val===r.name?" selected":""}>@${r.name}</option>`).join("");
+  return `<select id="${id}"><option value="">Choisir un rôle...</option>${opts}</select>`;
+}
+function numInput(key, min, max) {
+  return `<input type="number" value="${config[key]||0}" min="${min}" max="${max}" onchange="config['${key}']=parseInt(this.value)">`;
+}
+function typeIco(t) {
+  return {ban:"🔨",kick:"👢",warn:"⚠️",mute:"🔇",unmute:"🔊",messages:"💬",membres:"👥",vocal:"🎤",roles:"🎭",salons:"📁",pseudos:"✏️"}[t]||"📋";
+}
+function typeBadge(t) {
+  if (["ban","kick"].includes(t)) return `<span class="badge b-red">${typeIco(t)} ${t}</span>`;
+  if (t==="warn") return `<span class="badge b-yellow">⚠️ warn</span>`;
+  if (t==="mute") return `<span class="badge b-blue">🔇 mute</span>`;
+  return `<span class="badge b-green">${typeIco(t)} ${t}</span>`;
+}
+
+// ── PANELS ────────────────────────────────────────────
+async function renderPanel(name) {
+  const c = document.getElementById("content");
+  if (["stats","historique","sanctions","membres","missions"].includes(name)) {
+    c.innerHTML = `<div style="color:var(--text2);font-size:13px;padding:30px 0">⏳ Chargement...</div>`;
+  }
+  const renders = { general:renderGeneral, logs:renderLogs, xp:renderXP, shop:renderShop, moderation:renderModeration, tickets:renderTickets, reaction_roles:renderReactionRoles };
+  if (renders[name]) { c.innerHTML = renders[name](); return; }
+  if (name==="stats") { const d = await (await fetch(`${API}/stats/${currentGuild.id}`)).json(); c.innerHTML = renderStats(d); }
+  else if (name==="historique") { const d = await (await fetch(`${API}/logs/${currentGuild.id}?limit=100`)).json(); c.innerHTML = renderHistorique(d); }
+  else if (name==="sanctions") { const d = await (await fetch(`${API}/sanctions/${currentGuild.id}`)).json(); c.innerHTML = renderSanctions(d); }
+  else if (name==="membres") { const d = await (await fetch(`${API}/membres/${currentGuild.id}`)).json(); c.innerHTML = renderMembres(d); }
+  else if (name==="missions") { const d = await (await fetch(`${API}/missions/${currentGuild.id}`)).json(); c.innerHTML = renderMissions(d); }
+}
+
+function renderGeneral() {
+  return `<div class="panel-hd"><h2>Général</h2><p>Salons principaux du serveur</p></div>
+  <div class="card"><div class="card-head">Salons</div>
+    ${field("Bienvenue","Message à l'arrivée d'un nouveau membre",selectSalon("salon_bienvenue"))}
+    ${field("Anniversaires","Souhaits automatiques du bot",selectSalon("salon_anniversaire"))}
+    ${field("Suggestions","Où les membres soumettent leurs idées",selectSalon("salon_suggestions"))}
+  </div>`;
+}
+
+function renderLogs() {
+  const logs = [
+    ["logs_moderation","🛡️ Modération","Ban, kick, warn, mute..."],
+    ["logs_messages","💬 Messages","Édition & suppression de messages"],
+    ["logs_membres","👥 Membres","Arrivées & départs du serveur"],
+    ["logs_vocal","🎤 Vocal","Connexions et déconnexions vocales"],
+    ["logs_roles","🎭 Rôles","Ajout et retrait de rôles"],
+    ["logs_salons","📁 Salons","Création et suppression de salons"],
+    ["logs_pseudos","✏️ Pseudos","Changements de pseudonyme"],
+  ];
+  return `<div class="panel-hd"><h2>Logs</h2><p>Salons de journalisation des événements</p></div>
+  <div class="card"><div class="card-head">Canaux</div>${logs.map(([k,l,d])=>field(l,d,selectSalon(k))).join("")}</div>`;
+}
+
+function renderXP() {
+  const roles = config.roles_niveaux || {};
+  const tags = Object.entries(roles).sort((a,b)=>+a[0]-+b[0]).map(([n,r]) =>
+    `<div class="tag"><span class="tag-lvl">Niv.${n}</span><span class="tag-nm">${r}</span><button class="tag-x" onclick="delRole('${n}')">×</button></div>`
+  ).join("");
+  return `<div class="panel-hd"><h2>Niveaux & XP</h2><p>Système d'expérience et rôles automatiques</p></div>
+  <div class="card"><div class="card-head">Paramètres XP</div>
+    ${field("XP par message","Montant d'XP gagné à chaque message",numInput("xp_par_message",1,100))}
+    ${field("Seuil anti-spam","Nombre max de messages en 5 secondes",numInput("seuil_anti_spam",2,20))}
+  </div>
+  <div class="card"><div class="card-head">Rôles par niveau</div>
+    <div class="add-row top">
+      <input type="number" id="new-lvl" placeholder="Niveau" style="width:90px">
+      ${selectRole("new-role-sel")}
+      <button class="btn btn-blue" onclick="addRole()">Ajouter</button>
+    </div>
+    <div class="tags">${tags||`<span class="empty">Aucun rôle configuré</span>`}</div>
+  </div>`;
+}
+
+function renderShop() {
+  const shop = config.shop || {};
+  const items = Object.entries(shop).sort((a,b)=>a[1]-b[1]).map(([n,p]) =>
+    `<div class="item-row">
+      <div class="item-left"><span>🎭</span><div><div class="item-name">${n}</div></div></div>
+      <div style="display:flex;align-items:center;gap:9px">
+        <span class="badge b-yellow">${p} XP</span>
+        <button class="btn btn-sm btn-red" onclick="delItem('${n}')">Supprimer</button>
+      </div>
+    </div>`
+  ).join("");
+  return `<div class="panel-hd"><h2>Shop</h2><p>Rôles achetables avec l'XP</p></div>
+  <div class="card"><div class="card-head">Articles</div>
+    <div class="add-row top">
+      ${selectRole("new-shop-role")}
+      <input type="number" id="new-price" placeholder="Prix XP" style="width:100px">
+      <button class="btn btn-green" onclick="addItem()">Ajouter</button>
+    </div>
+    <div class="item-list">${items||`<span class="empty" style="display:block;padding:0 0 6px">Aucun article</span>`}</div>
+  </div>`;
+}
+
+function renderModeration() {
+  return `<div class="panel-hd"><h2>Modération</h2><p>Protection automatique du serveur</p></div>
+  <div class="card"><div class="card-head">Anti-spam</div>
+    ${field("Seuil anti-spam","Nombre max de messages en 5 secondes",numInput("seuil_anti_spam",2,20))}
+  </div>`;
+}
+
+function renderTickets() {
+  return `<div class="panel-hd"><h2>Tickets</h2><p>Système de support par tickets</p></div>
+  <div class="card"><div class="card-head">Configuration</div>
+    ${field("Catégorie des tickets","Catégorie Discord pour les tickets",selectCategorie("categorie_tickets"))}
+  </div>`;
+}
+
+function renderReactionRoles() {
+  const rr = config.reaction_roles || {};
+  const items = Object.entries(rr).flatMap(([msgId, emojis]) =>
+    Object.entries(emojis).map(([emoji, role]) =>
+      `<div class="item-row">
+        <div class="item-left">
+          <span style="font-size:22px">${emoji}</span>
+          <div>
+            <div class="item-name">${role}</div>
+            <div class="item-sub">Message ID: ${msgId}</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-red" onclick="delRR('${msgId}','${emoji}')">Supprimer</button>
+      </div>`
+    )
+  ).join("");
+  return `<div class="panel-hd"><h2>Reaction Roles</h2><p>Attribue des rôles via les réactions sur un message</p></div>
+  <div class="card"><div class="card-head">Associations actives</div>
+    <div class="add-row top">
+      <input type="text" id="rr-msgid" placeholder="ID du message" style="width:160px">
+      <input type="text" id="rr-emoji" placeholder="Emoji 🎮" style="width:75px">
+      ${selectRole("rr-role")}
+      <button class="btn btn-blue" onclick="addRR()">Ajouter</button>
+    </div>
+    <div class="item-list">${items||`<span class="empty" style="display:block;padding:0 0 6px">Aucune association configurée</span>`}</div>
+  </div>`;
+}
+
+function renderMissions(missions) {
+  const typeLabel = { messages:"💬 Messages", xp:"⭐ XP", invitations:"📨 Invitations" };
+  const typeColor = { messages:"blue", xp:"yellow", invitations:"green" };
+  setTimeout(() => {
+    const sel = document.getElementById("m-role");
+    if (sel) {
+      const roles = botData.roles || [];
+      sel.innerHTML = `<option value="">Aucun</option>` + roles.map(r => `<option value="${r.name}">${r.name}</option>`).join("");
+    }
+  }, 50);
+  const items = missions.map(m =>
+    `<div class="mission-card">
+      <div class="mission-ico">${typeLabel[m.type]?.split(" ")[0]||"🎯"}</div>
+      <div style="flex:1">
+        <div class="mission-title">${m.titre}</div>
+        <div class="mission-desc">${m.description}</div>
+        <div class="mission-tags">
+          <span class="badge b-${typeColor[m.type]||"blue"}">${typeLabel[m.type]||m.type} · ${m.objectif}</span>
+          <span class="badge b-yellow">+${m.recompense_xp} XP</span>
+          ${m.recompense_role?`<span class="badge b-green">🎭 ${m.recompense_role}</span>`:""}
+        </div>
+      </div>
+      <button class="btn btn-sm btn-red" onclick="delMission('${m.id}')">Supprimer</button>
+    </div>`
+  ).join("");
+  return `<div class="panel-hd"><h2>Missions</h2><p>Défis et récompenses journaliers</p></div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:4px">
+    <button class="btn btn-blue" onclick="document.getElementById('modal-mission').style.display='flex'">➕ Nouvelle mission</button>
+  </div>
+  <div class="card"><div class="card-head">Missions actives</div>
+    <div style="display:flex;flex-direction:column;gap:8px;padding:14px 18px">
+      ${items||`<span class="empty">Aucune mission configurée</span>`}
+    </div>
+  </div>`;
+}
+
+function renderMembres(membres) {
+  const rows = membres.map(m =>
+    `<div class="membre-row" onclick="voirProfil('${m.id}')">
+      <div class="m-av">${m.avatar?`<img src="${m.avatar}" alt="">`:"👤"}</div>
+      <div style="flex:1">
+        <div class="m-name">${m.name}</div>
+        <div class="m-sub">Niv.${m.niveau} · ${m.xp.toLocaleString()} XP ${m.sanctions>0?`· <span style="color:var(--red)">⚠️ ${m.sanctions}</span>`:""}</div>
+      </div>
+      <div class="m-arr">›</div>
+    </div>`
+  ).join("");
+  return `<div class="panel-hd"><h2>Membres</h2><p>Clique sur un membre pour voir son profil complet</p></div>
+  <div class="card">
+    <div class="search-wrap" style="padding-bottom:10px">
+      <input type="text" placeholder="🔍 Rechercher un membre..." oninput="rechercherMembres(this.value)">
+    </div>
+    <div id="membres-list">${rows||`<div class="empty" style="padding:16px 18px">Aucun membre trouvé</div>`}</div>
+  </div>`;
+}
+
+async function rechercherMembres(q) {
+  const d = await (await fetch(`${API}/membres/${currentGuild.id}?search=${encodeURIComponent(q)}`)).json();
+  const rows = d.map(m =>
+    `<div class="membre-row" onclick="voirProfil('${m.id}')">
+      <div class="m-av">${m.avatar?`<img src="${m.avatar}" alt="">`:"👤"}</div>
+      <div style="flex:1"><div class="m-name">${m.name}</div>
+      <div class="m-sub">Niv.${m.niveau} · ${m.xp.toLocaleString()} XP ${m.sanctions>0?`· <span style="color:var(--red)">⚠️ ${m.sanctions}</span>`:""}</div></div>
+      <div class="m-arr">›</div>
+    </div>`
+  ).join("");
+  document.getElementById("membres-list").innerHTML = rows || `<div class="empty" style="padding:16px 18px">Aucun résultat</div>`;
+}
+
+async function voirProfil(userId) {
+  const profil = await (await fetch(`${API}/profil/${currentGuild.id}/${userId}`)).json();
+  const av = profil.avatar ? `<img src="${profil.avatar}" alt="">` : "👤";
+  const sanctions = profil.sanctions.map((s, i) =>
+    `<div class="san-row">
+      <div>${typeBadge(s.action)}</div>
+      <div class="san-info">
+        <div class="san-raison">${s.raison||"Aucune raison"}</div>
+        <div class="san-meta">Par ${s.moderateur_nom} · ${s.date}</div>
+      </div>
+      <button class="btn btn-sm btn-red" onclick="supprimerSanctionProfil('${userId}',${i})">×</button>
+    </div>`
+  ).join("");
+  const roles = (profil.roles||[]).map(r => `<span class="badge b-blue">${r}</span>`).join(" ");
+  document.getElementById("modal-profil-content").innerHTML = `
+    <div class="profil-top">
+      <div class="profil-av">${av}</div>
+      <div>
+        <div class="profil-name">${profil.name}</div>
+        <div class="profil-id">${profil.id||userId}</div>
+        <div class="profil-join">Rejoint le ${profil.joined||"?"}</div>
+      </div>
+    </div>
+    <div class="profil-stats">
+      <div class="ps-card"><div class="ps-label">Niveau</div><div class="ps-val">${profil.niveau}</div></div>
+      <div class="ps-card"><div class="ps-label">XP total</div><div class="ps-val">${profil.xp?.toLocaleString()}</div></div>
+      <div class="ps-card"><div class="ps-label">Warns</div><div class="ps-val" style="color:${profil.warnings>0?"var(--red)":"var(--green)"}">${profil.warnings}</div></div>
+    </div>
+    ${roles ? `<div class="profil-section">Rôles</div><div class="roles-wrap" style="margin-bottom:18px">${roles}</div>` : ""}
+    <div class="profil-section">Sanctions (${profil.sanctions.length})</div>
+    <div class="card">${sanctions||`<div class="empty" style="padding:14px 18px">Aucune sanction ✅</div>`}</div>
+    <div class="modal-footer"><button class="btn-cancel" onclick="closeModal('modal-profil')">Fermer</button></div>`;
+  document.getElementById("modal-profil").style.display = "flex";
+}
+
+async function supprimerSanctionProfil(userId, index) {
+  await fetch(`${API}/sanctions/${currentGuild.id}/${userId}/${index}`, { method: "DELETE" });
+  toast("Sanction supprimée !", "green");
+  voirProfil(userId);
+}
+
+function renderSanctions(data) {
+  if (!data.length) return `<div class="panel-hd"><h2>Sanctions</h2><p>Historique des sanctions</p></div><div class="card"><div class="empty" style="padding:20px 18px">Aucune sanction enregistrée ✅</div></div>`;
+  const rows = data.map(m => {
+    const av = m.avatar ? `<img src="${m.avatar}" alt="">` : "👤";
+    const last = m.sanctions.slice(-2).reverse().map(s => typeBadge(s.action)).join(" ");
+    return `<div class="membre-row" onclick="voirProfil('${m.user_id}')">
+      <div class="m-av">${av}</div>
+      <div style="flex:1"><div class="m-name">${m.name}</div><div class="m-sub">${last}</div></div>
+      <span class="badge b-red">${m.total} sanction(s)</span>
+    </div>`;
+  }).join("");
+  return `<div class="panel-hd"><h2>Sanctions</h2><p>Clique sur un membre pour gérer ses sanctions</p></div>
+  <div class="card">${rows}</div>`;
+}
+
+function renderHistorique(logs) {
+  if (!logs.length) return `<div class="panel-hd"><h2>Historique</h2><p>Dernières actions enregistrées</p></div><div class="card"><div class="empty" style="padding:20px 18px">Aucun log disponible</div></div>`;
+  const rows = logs.map(l =>
+    `<div class="log-row">
+      <div class="log-ico">${typeIco(l.type||"")}</div>
+      <div class="log-txt">${l.action||l.message||JSON.stringify(l)}</div>
+      <div class="log-time">${l.date||""}</div>
+    </div>`
+  ).join("");
+  return `<div class="panel-hd"><h2>Historique des logs</h2><p>100 dernières actions</p></div>
+  <div class="card">${rows}</div>`;
+}
+
+function renderStats(data) {
+  const rc = i => i===0?"gold":i===1?"silver":i===2?"bronze":"";
+  const top = data.top10.map((p,i) =>
+    `<div class="top-row">
+      <div class="rank ${rc(i)}">#${i+1}</div>
+      <div class="p-name">${p.user_id}</div>
+      <div class="p-xp">${p.xp.toLocaleString()} XP</div>
+      <div class="p-lvl">Niv.${p.niveau}</div>
+    </div>`
+  ).join("") || `<div class="empty" style="padding:16px 18px">Aucune donnée</div>`;
+  return `<div class="panel-hd"><h2>Statistiques XP</h2><p>Classement général du serveur</p></div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Membres actifs</div><div class="stat-value">${data.total_membres}</div><div class="stat-sub">ont gagné de l'XP</div></div>
+    <div class="stat-card"><div class="stat-label">XP distribué</div><div class="stat-value">${(data.total_xp||0).toLocaleString()}</div><div class="stat-sub">au total</div></div>
+    <div class="stat-card"><div class="stat-label">Moyenne</div><div class="stat-value">${data.total_membres?Math.round(data.total_xp/data.total_membres):0}</div><div class="stat-sub">XP par membre</div></div>
+    <div class="stat-card"><div class="stat-label">Sanctions</div><div class="stat-value" style="color:var(--red)">${data.total_sanctions||0}</div><div class="stat-sub">au total</div></div>
+  </div>
+  <div class="card"><div class="card-head">Top 10 joueurs</div>${top}</div>`;
+}
+
+// ── ACTIONS ───────────────────────────────────────────
+async function addRole() {
+  const lvl = document.getElementById("new-lvl").value.trim();
+  const role = document.getElementById("new-role-sel").value;
+  if (!lvl || !role) return;
+  await fetch(`${API}/config/${currentGuild.id}/roles`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({niveau:lvl,role}) });
+  config.roles_niveaux[lvl] = role; renderPanel("xp");
+}
+async function delRole(niveau) {
+  await fetch(`${API}/config/${currentGuild.id}/roles/${niveau}`, { method:"DELETE" });
+  delete config.roles_niveaux[niveau]; renderPanel("xp");
+}
+async function addItem() {
+  const nom = document.getElementById("new-shop-role").value;
+  const prix = parseInt(document.getElementById("new-price").value);
+  if (!nom || isNaN(prix) || prix <= 0) return;
+  await fetch(`${API}/config/${currentGuild.id}/shop`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({nom,prix}) });
+  config.shop[nom] = prix; renderPanel("shop");
+}
+async function delItem(nom) {
+  await fetch(`${API}/config/${currentGuild.id}/shop/${encodeURIComponent(nom)}`, { method:"DELETE" });
+  delete config.shop[nom]; renderPanel("shop");
+}
+async function addRR() {
+  const msgId = document.getElementById("rr-msgid").value.trim();
+  const emoji = document.getElementById("rr-emoji").value.trim();
+  const role = document.getElementById("rr-role").value;
+  if (!msgId || !emoji || !role) return;
+  await fetch(`${API}/config/${currentGuild.id}/reaction_roles`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({message_id:msgId,emoji,role}) });
+  if (!config.reaction_roles) config.reaction_roles = {};
+  if (!config.reaction_roles[msgId]) config.reaction_roles[msgId] = {};
+  config.reaction_roles[msgId][emoji] = role; renderPanel("reaction_roles");
+}
+async function delRR(msgId, emoji) {
+  await fetch(`${API}/config/${currentGuild.id}/reaction_roles/${msgId}/${encodeURIComponent(emoji)}`, { method:"DELETE" });
+  delete config.reaction_roles[msgId][emoji];
+  if (!Object.keys(config.reaction_roles[msgId]).length) delete config.reaction_roles[msgId];
+  renderPanel("reaction_roles");
+}
+async function submitMission() {
+  const titre = document.getElementById("m-titre").value.trim();
+  const desc = document.getElementById("m-desc").value.trim();
+  const type = document.getElementById("m-type").value;
+  const objectif = parseInt(document.getElementById("m-objectif").value);
+  const xp = parseInt(document.getElementById("m-xp").value);
+  const role = document.getElementById("m-role").value;
+  if (!titre || !desc || isNaN(objectif) || isNaN(xp)) return;
+  await fetch(`${API}/missions/${currentGuild.id}`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({titre,description:desc,type,objectif,recompense_xp:xp,recompense_role:role||null}) });
+  closeModal("modal-mission"); toast("Mission ajoutée !", "green"); renderPanel("missions");
+}
+async function delMission(id) {
+  await fetch(`${API}/missions/${currentGuild.id}/${id}`, { method:"DELETE" });
+  toast("Mission supprimée !", "green"); renderPanel("missions");
+}
+
+// ── UTILS ─────────────────────────────────────────────
+function show(id) { document.getElementById(id).style.display = ""; }
+function hide(id) { document.getElementById(id).style.display = "none"; }
+function closeModal(id) { document.getElementById(id).style.display = "none"; }
+function toast(msg, type="green") {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = `toast ${type==="red"?"error":"green"} show`;
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+function getCookie(n) { return document.cookie.split(";").map(c=>c.trim()).find(c=>c.startsWith(n+"="))?.split("=")[1]; }
+function setCookie(n, v, d) { document.cookie = `${n}=${v};max-age=${d*86400};path=/`; }
+function deleteCookie(n) { document.cookie = `${n}=;max-age=0;path=/`; }
+
+init();
+</script>
+</body>
+</html>

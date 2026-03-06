@@ -393,10 +393,19 @@ class Configuration(commands.Cog):
         await interaction.response.send_message(embed=embed)
 
     async def cog_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+
         if isinstance(error, app_commands.MissingPermissions):
-            await interaction.response.send_message("Tu n'as pas la permission !", ephemeral=True)
+            message = "❌ Tu n'as pas la permission d'utiliser cette commande."
         else:
-            await interaction.response.send_message(f"Erreur : {error}", ephemeral=True)
+            message = f"⚠️ Une erreur est survenue : {error}"
+
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send(message, ephemeral=True)
+            else:
+                await interaction.response.send_message(message, ephemeral=True)
+        except discord.NotFound:
+            pass
 
 
 async def setup(bot: commands.Bot):

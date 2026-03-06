@@ -17,7 +17,12 @@ TOKEN       = os.getenv("TOKEN")
 MONGODB_URI = os.getenv("MONGODB_URI")
 
 # Connexion MongoDB
-client = MongoClient(MONGODB_URI)
+client = MongoClient(
+    MONGODB_URI,
+    tls=True,
+    tlsAllowInvalidCertificates=True,
+    serverSelectionTimeoutMS=30000
+)
 db     = client["katsubot"]
 
 # Collections

@@ -208,35 +208,5 @@ class Moderation(commands.Cog):
         await interaction.response.send_message("🔴 Bot arrêté !", ephemeral=True)
         import os
         os._exit(0)
-
-    # ── /dm ────────────────────────────────────
-
-    @app_commands.command(name="dm", description="Envoie un message privé à un membre via le bot")
-    @app_commands.describe(membre="Le membre à contacter", message="Le message à envoyer")
-    @app_commands.checks.has_permissions(administrator=True)
-    async def dm(self, interaction: discord.Interaction, membre: discord.Member, message: str):
-        try:
-            embed = discord.Embed(
-                title=f"📩 Message de {interaction.guild.name}",
-                description=message,
-                color=discord.Color.blurple()
-            )
-            embed.set_footer(text=f"Envoyé par {interaction.user.display_name}")
-            await membre.send(embed=embed)
-            await interaction.response.send_message(f"✅ Message envoyé à {membre.mention} !", ephemeral=True)
-        except discord.Forbidden:
-            await interaction.response.send_message(
-                f"❌ Impossible d'envoyer un MP à {membre.mention} — ses DMs sont fermés.", ephemeral=True
-            )
-
-    # ── Gestion des erreurs ────────────────────
-
-    async def cog_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
-        if isinstance(error, app_commands.MissingPermissions):
-            await interaction.response.send_message("Tu n'as pas la permission !", ephemeral=True)
-        else:
-            await interaction.response.send_message(f"Erreur : {error}", ephemeral=True)
-
-
 async def setup(bot: commands.Bot):
     await bot.add_cog(Moderation(bot))

@@ -246,7 +246,7 @@ class Missions(commands.Cog):
 
     # ── /missions_claim ────────────────────────
 
-    @app_commands.command(name="missions_claim", description="Réclame les XP de tes missions complétées")
+    @app_commands.command(name="reward_claim", description="Réclame les XP de tes missions complétées")
     async def missions_claim(self, interaction: discord.Interaction):
         data   = charger_data()
         joueur = get_missions_joueur(data, interaction.guild_id, interaction.user.id)
