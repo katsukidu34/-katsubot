@@ -81,55 +81,9 @@ class Utilitaires(commands.Cog):
         embed.set_footer(text=f"ID : {cible.id}")
         await interaction.response.send_message(embed=embed)
 
-    # ── /daily ─────────────────────────────────
 
-    @app_commands.command(name="daily", description="Récupère ta récompense XP quotidienne")
-    async def daily(self, interaction: discord.Interaction):
-        data   = charger_data()
-        joueur = get_joueur(data, interaction.guild_id, interaction.user.id)
-        now    = time.time()
 
-        derniere_recup = joueur.get("derniere_daily", 0)
-        temps_restant  = (derniere_recup + 86400) - now
-
-        if temps_restant > 0:
-            heures  = int(temps_restant // 3600)
-            minutes = int((temps_restant % 3600) // 60)
-            embed = discord.Embed(
-                title="⏳ Daily déjà récupéré !",
-                description=f"Reviens dans **{heures}h {minutes}min**.",
-                color=discord.Color.red()
-            )
-            await interaction.response.send_message(embed=embed, ephemeral=True)
-            return
-
-        joueur["xp"]           += DAILY_XP
-        joueur["derniere_daily"] = now
-        cfg = get_config(interaction.guild_id)
-        messages_niveau = []
-
-        while joueur["xp"] >= xp_pour_niveau(joueur["niveau"]):
-            joueur["xp"] -= xp_pour_niveau(joueur["niveau"])
-            joueur["niveau"] += 1
-            nv = joueur["niveau"]
-            messages_niveau.append(f"🎉 Tu passes au **niveau {nv}** !")
-            if str(nv) in cfg["roles_niveaux"]:
-                role = discord.utils.get(interaction.guild.roles, name=cfg["roles_niveaux"][str(nv)])
-                if role:
-                    await interaction.user.add_roles(role)
-                    messages_niveau.append(f"🎭 Tu obtiens le rôle **{role.name}** !")
-
-        sauvegarder_data(data)
-
-        embed = discord.Embed(
-            title="🎁 Récompense quotidienne !",
-            description=f"Tu as reçu **{DAILY_XP} XP** !\n" + "\n".join(messages_niveau),
-            color=discord.Color.green()
-        )
-        embed.add_field(name="⭐ XP total", value=f"{joueur['xp']} / {xp_pour_niveau(joueur['niveau'])}", inline=True)
-        embed.add_field(name="🏅 Niveau",   value=str(joueur["niveau"]),                                  inline=True)
-        embed.set_footer(text="Reviens dans 24h pour ta prochaine récompense !")
-        await interaction.response.send_message(embed=embed)
+   
 
     # ── /serveur ───────────────────────────────
 

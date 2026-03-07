@@ -1,0 +1,527 @@
+"""
+cogs/economie.py — Système d'économie complet style UnbelievaBoat
+==================================================================
+/solde       → Voir son solde (cash + banque)
+/daily       → Récompense quotidienne
+/weekly      → Récompense hebdomadaire
+/work        → Travailler pour gagner de l'argent
+/deposer     → Déposer de l'argent en banque
+/retirer     → Retirer de l'argent de la banque
+/payer       → Payer un membre
+/gamble      → Jouer au casino
+/coinflip    → Pile ou face
+/rob         → Voler un membre
+/richesse    → Leaderboard argent
+/add-money   → Ajouter de l'argent (admin)
+/remove-money→ Retirer de l'argent (admin)
+/reset-money → Reset l'économie d'un membre (admin)
+"""
+
+import discord
+import random
+import asyncio
+from discord import app_commands
+from discord.ext import commands
+from datetime import datetime, timedelta
+from pymongo import MongoClient
+
+from config import MONGODB_URI
+
+# ══════════════════════════════════════════════
+# CONNEXION MONGODB
+# ══════════════════════════════════════════════
+
+client  = MongoClient(MONGODB_URI, tls=True, tlsAllowInvalidCertificates=True)
+db      = client["katsubot"]
+col_eco = db["economie"]
+
+SYMBOLE  = "💵"
+MONNAIE  = "coins"
+
+# ══════════════════════════════════════════════
+# HELPERS
+# ══════════════════════════════════════════════
+
+def get_compte(guild_id: int, user_id: int) -> dict:
+    gid, uid = str(guild_id), str(user_id)
+    doc = col_eco.find_one({"guild_id": gid, "user_id": uid}, {"_id": 0})
+    if not doc:
+        doc = {
+            "guild_id":    gid,
+            "user_id":     uid,
+            "cash":        0,
+            "banque":      0,
+            "daily_last":  0,
+            "weekly_last": 0,
+            "work_last":   0,
+            "rob_last":    0,
+        }
+        col_eco.insert_one({**doc})
+    return doc
+
+def save_compte(guild_id: int, user_id: int, data: dict):
+    gid, uid = str(guild_id), str(user_id)
+    col_eco.update_one(
+        {"guild_id": gid, "user_id": uid},
+        {"$set": data},
+        upsert=True
+    )
+
+def fmt(montant: int) -> str:
+    return f"{montant:,} {SYMBOLE}".replace(",", " ")
+
+def embed_base(title: str, color=discord.Color.gold()) -> discord.Embed:
+    return discord.Embed(title=title, color=color, timestamp=datetime.utcnow())
+
+
+# ══════════════════════════════════════════════
+# VUE COINFLIP
+# ══════════════════════════════════════════════
+
+class VueCoinflip(discord.ui.View):
+    def __init__(self, user_id: int, mise: int, guild_id: int):
+        super().__init__(timeout=30)
+        self.user_id  = user_id
+        self.mise     = mise
+        self.guild_id = guild_id
+
+    @discord.ui.button(label="🪙 Pile", style=discord.ButtonStyle.primary)
+    async def pile(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.jouer(interaction, "pile")
+
+    @discord.ui.button(label="🪙 Face", style=discord.ButtonStyle.secondary)
+    async def face(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.jouer(interaction, "face")
+
+    async def jouer(self, interaction: discord.Interaction, choix: str):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("❌ Ce n'est pas ton jeu !", ephemeral=True)
+            return
+
+        compte = get_compte(self.guild_id, self.user_id)
+        if compte["cash"] < self.mise:
+            await interaction.response.send_message("❌ Tu n'as plus assez de cash !", ephemeral=True)
+            return
+
+        resultat = random.choice(["pile", "face"])
+        gagne    = choix == resultat
+
+        if gagne:
+            compte["cash"] += self.mise
+            titre  = "🎉 Tu as gagné !"
+            color  = discord.Color.green()
+            desc   = f"Le résultat était **{resultat}** — tu avais choisi **{choix}** !\n\n+{fmt(self.mise)}"
+        else:
+            compte["cash"] -= self.mise
+            titre  = "😢 Tu as perdu !"
+            color  = discord.Color.red()
+            desc   = f"Le résultat était **{resultat}** — tu avais choisi **{choix}** !\n\n-{fmt(self.mise)}"
+
+        save_compte(self.guild_id, self.user_id, compte)
+
+        for item in self.children:
+            item.disabled = True
+
+        embed = embed_base(titre, color)
+        embed.description = desc
+        embed.set_footer(text=f"Solde : {fmt(compte['cash'])}")
+        await interaction.response.edit_message(embed=embed, view=self)
+
+
+# ══════════════════════════════════════════════
+# COG
+# ══════════════════════════════════════════════
+
+class Economie(commands.Cog):
+
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+
+    # ── /solde ─────────────────────────────────
+
+    @app_commands.command(name="solde", description="Affiche ton solde")
+    @app_commands.describe(membre="Le membre à consulter (toi par défaut)")
+    async def solde(self, interaction: discord.Interaction, membre: discord.Member = None):
+        cible   = membre or interaction.user
+        compte  = get_compte(interaction.guild_id, cible.id)
+        total   = compte["cash"] + compte["banque"]
+
+        embed = embed_base(f"💰 Solde de {cible.display_name}")
+        embed.set_thumbnail(url=cible.display_avatar.url)
+        embed.add_field(name="👛 Cash",    value=fmt(compte["cash"]),   inline=True)
+        embed.add_field(name="🏦 Banque",  value=fmt(compte["banque"]), inline=True)
+        embed.add_field(name="💎 Total",   value=fmt(total),            inline=True)
+        embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon.url if interaction.guild.icon else None)
+        await interaction.response.send_message(embed=embed)
+
+    # ── /daily ─────────────────────────────────
+
+    @app_commands.command(name="daily", description="Récupère ta récompense quotidienne")
+    async def daily(self, interaction: discord.Interaction):
+        compte = get_compte(interaction.guild_id, interaction.user.id)
+        now    = datetime.utcnow().timestamp()
+        delai  = 86400  # 24h
+
+        if now - compte["daily_last"] < delai:
+            restant = delai - (now - compte["daily_last"])
+            heures  = int(restant // 3600)
+            minutes = int((restant % 3600) // 60)
+            embed = embed_base("⏰ Daily déjà récupéré", discord.Color.orange())
+            embed.description = f"Tu pourras récupérer ton daily dans **{heures}h {minutes}min** !"
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        gain           = random.randint(100, 500)
+        compte["cash"] += gain
+        compte["daily_last"] = now
+        save_compte(interaction.guild_id, interaction.user.id, compte)
+
+        embed = embed_base("🎁 Daily récupéré !", discord.Color.green())
+        embed.description = f"Tu as reçu **{fmt(gain)}** !\n💰 Nouveau solde : {fmt(compte['cash'])}"
+        embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
+        await interaction.response.send_message(embed=embed)
+
+    # ── /weekly ────────────────────────────────
+
+    @app_commands.command(name="weekly", description="Récupère ta récompense hebdomadaire")
+    async def weekly(self, interaction: discord.Interaction):
+        compte = get_compte(interaction.guild_id, interaction.user.id)
+        now    = datetime.utcnow().timestamp()
+        delai  = 604800  # 7 jours
+
+        if now - compte["weekly_last"] < delai:
+            restant = delai - (now - compte["weekly_last"])
+            jours   = int(restant // 86400)
+            heures  = int((restant % 86400) // 3600)
+            embed = embed_base("⏰ Weekly déjà récupéré", discord.Color.orange())
+            embed.description = f"Tu pourras récupérer ton weekly dans **{jours}j {heures}h** !"
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        gain = random.randint(1000, 3000)
+        compte["cash"] += gain
+        compte["weekly_last"] = now
+        save_compte(interaction.guild_id, interaction.user.id, compte)
+
+        embed = embed_base("🎁 Weekly récupéré !", discord.Color.green())
+        embed.description = f"Tu as reçu **{fmt(gain)}** !\n💰 Nouveau solde : {fmt(compte['cash'])}"
+        embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
+        await interaction.response.send_message(embed=embed)
+
+    # ── /work ──────────────────────────────────
+
+    @app_commands.command(name="work", description="Travailler pour gagner de l'argent (cooldown 1h)")
+    async def work(self, interaction: discord.Interaction):
+        compte = get_compte(interaction.guild_id, interaction.user.id)
+        now    = datetime.utcnow().timestamp()
+        delai  = 3600  # 1h
+
+        if now - compte["work_last"] < delai:
+            restant = delai - (now - compte["work_last"])
+            minutes = int(restant // 60)
+            embed = embed_base("⏰ Déjà au travail !", discord.Color.orange())
+            embed.description = f"Tu pourras retravailler dans **{minutes} minutes** !"
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        metiers = [
+            ("🍕 Livreur de pizza",     50,  150),
+            ("💻 Développeur",          200, 500),
+            ("🎮 Joueur pro",           100, 300),
+            ("🎵 DJ",                   80,  250),
+            ("🚗 Chauffeur Uber",        60,  180),
+            ("🍔 Cuisinier",            40,  120),
+            ("📦 Livreur Amazon",        50,  160),
+            ("🎨 Designer",             150, 400),
+            ("📸 Photographe",          100, 350),
+            ("🏋️ Coach sportif",        80,  240),
+        ]
+        metier, min_gain, max_gain = random.choice(metiers)
+        gain = random.randint(min_gain, max_gain)
+
+        compte["cash"]     += gain
+        compte["work_last"] = now
+        save_compte(interaction.guild_id, interaction.user.id, compte)
+
+        embed = embed_base("💼 Travail effectué !", discord.Color.green())
+        embed.description = f"{metier}\nTu as gagné **{fmt(gain)}** !\n💰 Solde : {fmt(compte['cash'])}"
+        embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
+        await interaction.response.send_message(embed=embed)
+
+    # ── /deposer ───────────────────────────────
+
+    @app_commands.command(name="deposer", description="Déposer de l'argent en banque")
+    @app_commands.describe(montant="Montant à déposer (ou 'tout')")
+    async def deposer(self, interaction: discord.Interaction, montant: str):
+        compte = get_compte(interaction.guild_id, interaction.user.id)
+
+        if montant.lower() in ("tout", "all", "max"):
+            somme = compte["cash"]
+        else:
+            try:
+                somme = int(montant)
+            except ValueError:
+                await interaction.response.send_message("❌ Montant invalide !", ephemeral=True)
+                return
+
+        if somme <= 0:
+            await interaction.response.send_message("❌ Le montant doit être positif !", ephemeral=True)
+            return
+        if somme > compte["cash"]:
+            await interaction.response.send_message(f"❌ Tu n'as que {fmt(compte['cash'])} en cash !", ephemeral=True)
+            return
+
+        compte["cash"]   -= somme
+        compte["banque"] += somme
+        save_compte(interaction.guild_id, interaction.user.id, compte)
+
+        embed = embed_base("🏦 Dépôt effectué !", discord.Color.green())
+        embed.add_field(name="💸 Déposé",  value=fmt(somme),            inline=True)
+        embed.add_field(name="👛 Cash",    value=fmt(compte["cash"]),   inline=True)
+        embed.add_field(name="🏦 Banque",  value=fmt(compte["banque"]), inline=True)
+        await interaction.response.send_message(embed=embed)
+
+    # ── /retirer ───────────────────────────────
+
+    @app_commands.command(name="retirer", description="Retirer de l'argent de la banque")
+    @app_commands.describe(montant="Montant à retirer (ou 'tout')")
+    async def retirer(self, interaction: discord.Interaction, montant: str):
+        compte = get_compte(interaction.guild_id, interaction.user.id)
+
+        if montant.lower() in ("tout", "all", "max"):
+            somme = compte["banque"]
+        else:
+            try:
+                somme = int(montant)
+            except ValueError:
+                await interaction.response.send_message("❌ Montant invalide !", ephemeral=True)
+                return
+
+        if somme <= 0:
+            await interaction.response.send_message("❌ Le montant doit être positif !", ephemeral=True)
+            return
+        if somme > compte["banque"]:
+            await interaction.response.send_message(f"❌ Tu n'as que {fmt(compte['banque'])} en banque !", ephemeral=True)
+            return
+
+        compte["banque"] -= somme
+        compte["cash"]   += somme
+        save_compte(interaction.guild_id, interaction.user.id, compte)
+
+        embed = embed_base("🏦 Retrait effectué !", discord.Color.green())
+        embed.add_field(name="💸 Retiré",  value=fmt(somme),            inline=True)
+        embed.add_field(name="👛 Cash",    value=fmt(compte["cash"]),   inline=True)
+        embed.add_field(name="🏦 Banque",  value=fmt(compte["banque"]), inline=True)
+        await interaction.response.send_message(embed=embed)
+
+    # ── /payer ─────────────────────────────────
+
+    @app_commands.command(name="payer", description="Payer un membre")
+    @app_commands.describe(membre="Le membre à payer", montant="Le montant à envoyer")
+    async def payer(self, interaction: discord.Interaction, membre: discord.Member, montant: int):
+        if membre.id == interaction.user.id:
+            await interaction.response.send_message("❌ Tu ne peux pas te payer toi-même !", ephemeral=True)
+            return
+        if membre.bot:
+            await interaction.response.send_message("❌ Tu ne peux pas payer un bot !", ephemeral=True)
+            return
+        if montant <= 0:
+            await interaction.response.send_message("❌ Le montant doit être positif !", ephemeral=True)
+            return
+
+        compte_payeur = get_compte(interaction.guild_id, interaction.user.id)
+        if compte_payeur["cash"] < montant:
+            await interaction.response.send_message(f"❌ Tu n'as que {fmt(compte_payeur['cash'])} en cash !", ephemeral=True)
+            return
+
+        compte_receveur = get_compte(interaction.guild_id, membre.id)
+        compte_payeur["cash"]   -= montant
+        compte_receveur["cash"] += montant
+
+        save_compte(interaction.guild_id, interaction.user.id, compte_payeur)
+        save_compte(interaction.guild_id, membre.id, compte_receveur)
+
+        embed = embed_base("💸 Paiement effectué !", discord.Color.green())
+        embed.description = f"{interaction.user.mention} a envoyé **{fmt(montant)}** à {membre.mention} !"
+        embed.add_field(name="Ton nouveau solde", value=fmt(compte_payeur["cash"]), inline=True)
+        await interaction.response.send_message(embed=embed)
+
+    # ── /gamble ────────────────────────────────
+
+    @app_commands.command(name="gamble", description="Jouer au casino (50% de chance de doubler)")
+    @app_commands.describe(montant="Montant à miser")
+    async def gamble(self, interaction: discord.Interaction, montant: int):
+        compte = get_compte(interaction.guild_id, interaction.user.id)
+
+        if montant <= 0:
+            await interaction.response.send_message("❌ La mise doit être positive !", ephemeral=True)
+            return
+        if montant > compte["cash"]:
+            await interaction.response.send_message(f"❌ Tu n'as que {fmt(compte['cash'])} en cash !", ephemeral=True)
+            return
+
+        gagne = random.random() < 0.5
+
+        if gagne:
+            compte["cash"] += montant
+            embed = embed_base("🎰 JACKPOT !", discord.Color.green())
+            embed.description = f"Tu as **gagné** {fmt(montant)} !\n💰 Nouveau solde : {fmt(compte['cash'])}"
+        else:
+            compte["cash"] -= montant
+            embed = embed_base("🎰 Perdu !", discord.Color.red())
+            embed.description = f"Tu as **perdu** {fmt(montant)} !\n💰 Nouveau solde : {fmt(compte['cash'])}"
+
+        save_compte(interaction.guild_id, interaction.user.id, compte)
+        embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
+        await interaction.response.send_message(embed=embed)
+
+    # ── /coinflip ──────────────────────────────
+
+    @app_commands.command(name="coinflip", description="Pile ou face — double ou rien !")
+    @app_commands.describe(montant="Montant à miser")
+    async def coinflip(self, interaction: discord.Interaction, montant: int):
+        compte = get_compte(interaction.guild_id, interaction.user.id)
+
+        if montant <= 0:
+            await interaction.response.send_message("❌ La mise doit être positive !", ephemeral=True)
+            return
+        if montant > compte["cash"]:
+            await interaction.response.send_message(f"❌ Tu n'as que {fmt(compte['cash'])} en cash !", ephemeral=True)
+            return
+
+        embed = embed_base("🪙 Coinflip — Choisis !", discord.Color.gold())
+        embed.description = f"Mise : **{fmt(montant)}**\nChoisis **Pile** ou **Face** !"
+        vue = VueCoinflip(interaction.user.id, montant, interaction.guild_id)
+        await interaction.response.send_message(embed=embed, view=vue)
+
+    # ── /rob ───────────────────────────────────
+
+    @app_commands.command(name="rob", description="Tenter de voler un membre (risqué !)")
+    @app_commands.describe(membre="Le membre à voler")
+    async def rob(self, interaction: discord.Interaction, membre: discord.Member):
+        if membre.id == interaction.user.id:
+            await interaction.response.send_message("❌ Tu ne peux pas te voler toi-même !", ephemeral=True)
+            return
+        if membre.bot:
+            await interaction.response.send_message("❌ Tu ne peux pas voler un bot !", ephemeral=True)
+            return
+
+        compte_voleur  = get_compte(interaction.guild_id, interaction.user.id)
+        compte_victime = get_compte(interaction.guild_id, membre.id)
+        now = datetime.utcnow().timestamp()
+
+        if now - compte_voleur["rob_last"] < 3600:
+            restant = 3600 - (now - compte_voleur["rob_last"])
+            minutes = int(restant // 60)
+            await interaction.response.send_message(
+                f"❌ Tu dois attendre encore **{minutes} minutes** avant de voler !", ephemeral=True
+            )
+            return
+
+        if compte_victime["cash"] < 100:
+            await interaction.response.send_message(
+                f"❌ {membre.display_name} n'a pas assez de cash à voler !", ephemeral=True
+            )
+            return
+
+        compte_voleur["rob_last"] = now
+        succes = random.random() < 0.4  # 40% de chance
+
+        if succes:
+            vol = random.randint(50, min(500, compte_victime["cash"] // 2))
+            compte_victime["cash"] -= vol
+            compte_voleur["cash"]  += vol
+            save_compte(interaction.guild_id, interaction.user.id, compte_voleur)
+            save_compte(interaction.guild_id, membre.id, compte_victime)
+
+            embed = embed_base("🦹 Vol réussi !", discord.Color.green())
+            embed.description = f"Tu as volé **{fmt(vol)}** à {membre.mention} !\n💰 Ton solde : {fmt(compte_voleur['cash'])}"
+        else:
+            amende = random.randint(100, 300)
+            compte_voleur["cash"] = max(0, compte_voleur["cash"] - amende)
+            save_compte(interaction.guild_id, interaction.user.id, compte_voleur)
+
+            embed = embed_base("🚔 Vol échoué !", discord.Color.red())
+            embed.description = f"Tu t'es fait attraper ! Tu paies une amende de **{fmt(amende)}** !\n💰 Ton solde : {fmt(compte_voleur['cash'])}"
+
+        embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
+        await interaction.response.send_message(embed=embed)
+
+    # ── /richesse ──────────────────────────────
+
+    @app_commands.command(name="richesse", description="Classement des membres les plus riches")
+    async def richesse(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        gid = str(interaction.guild_id)
+
+        docs = list(col_eco.find({"guild_id": gid}, {"_id": 0}).sort("cash", -1).limit(10))
+        if not docs:
+            await interaction.followup.send("Personne n'a encore d'argent !")
+            return
+
+        embed = embed_base("🏆 Classement des plus riches", discord.Color.gold())
+        embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon.url if interaction.guild.icon else None)
+
+        medailles = ["🥇", "🥈", "🥉"]
+        desc = ""
+        for i, doc in enumerate(docs):
+            try:
+                user  = await self.bot.fetch_user(int(doc["user_id"]))
+                nom   = user.display_name
+            except Exception:
+                nom = "Utilisateur inconnu"
+            medaille = medailles[i] if i < 3 else f"**{i+1}.**"
+            total    = doc["cash"] + doc.get("banque", 0)
+            desc    += f"{medaille} {nom} — {fmt(total)}\n"
+
+        embed.description = desc
+        await interaction.followup.send(embed=embed)
+
+    # ── /add-money (admin) ─────────────────────
+
+    @app_commands.command(name="add-money", description="Ajouter de l'argent à un membre (admin)")
+    @app_commands.describe(membre="Le membre", montant="Montant à ajouter")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def add_money(self, interaction: discord.Interaction, membre: discord.Member, montant: int):
+        compte = get_compte(interaction.guild_id, membre.id)
+        compte["cash"] += montant
+        save_compte(interaction.guild_id, membre.id, compte)
+
+        embed = embed_base("✅ Argent ajouté", discord.Color.green())
+        embed.description = f"**+{fmt(montant)}** ajouté à {membre.mention}\n💰 Nouveau solde : {fmt(compte['cash'])}"
+        await interaction.response.send_message(embed=embed)
+
+    # ── /remove-money (admin) ──────────────────
+
+    @app_commands.command(name="remove-money", description="Retirer de l'argent à un membre (admin)")
+    @app_commands.describe(membre="Le membre", montant="Montant à retirer")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def remove_money(self, interaction: discord.Interaction, membre: discord.Member, montant: int):
+        compte = get_compte(interaction.guild_id, membre.id)
+        compte["cash"] = max(0, compte["cash"] - montant)
+        save_compte(interaction.guild_id, membre.id, compte)
+
+        embed = embed_base("✅ Argent retiré", discord.Color.orange())
+        embed.description = f"**-{fmt(montant)}** retiré à {membre.mention}\n💰 Nouveau solde : {fmt(compte['cash'])}"
+        await interaction.response.send_message(embed=embed)
+
+    # ── /reset-money (admin) ───────────────────
+
+    @app_commands.command(name="reset-money", description="Réinitialiser l'économie d'un membre (admin)")
+    @app_commands.describe(membre="Le membre à reset")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def reset_money(self, interaction: discord.Interaction, membre: discord.Member):
+        save_compte(interaction.guild_id, membre.id, {"cash": 0, "banque": 0})
+        embed = embed_base("🔄 Économie réinitialisée", discord.Color.red())
+        embed.description = f"L'économie de {membre.mention} a été remise à zéro."
+        await interaction.response.send_message(embed=embed)
+
+    async def cog_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.MissingPermissions):
+            await interaction.response.send_message("❌ Tu n'as pas la permission !", ephemeral=True)
+        else:
+            await interaction.response.send_message(f"❌ Erreur : {error}", ephemeral=True)
+
+
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Economie(bot))

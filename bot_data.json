@@ -1,0 +1,1175 @@
+{
+  "1160960588206321747": {
+    "name": "Le club jardin on adore ca",
+    "icon": "https://cdn.discordapp.com/icons/1160960588206321747/bf3d95a2ac432f7dbe1629dde6b16425.png?size=1024",
+    "members": 4,
+    "salons": [
+      {
+        "id": "1160960588206321750",
+        "name": "#bienvenue"
+      },
+      {
+        "id": "1160961172145721384",
+        "name": "#general"
+      },
+      {
+        "id": "1160961228752048258",
+        "name": "#soundboard"
+      },
+      {
+        "id": "1160961265053749389",
+        "name": "#musique"
+      },
+      {
+        "id": "1160961375611408496",
+        "name": "#screen"
+      },
+      {
+        "id": "1167758215648383027",
+        "name": "#anti-ulysse"
+      }
+    ],
+    "categories": [
+      {
+        "id": "1160960588206321748",
+        "name": "📁 Salons textuels"
+      },
+      {
+        "id": "1160960588206321749",
+        "name": "📁 Salons vocaux"
+      }
+    ],
+    "roles": [
+      {
+        "id": "1160966821814468659",
+        "name": "Chef"
+      },
+      {
+        "id": "1160961884095266816",
+        "name": "ADMIN"
+      },
+      {
+        "id": "1160962228690894888",
+        "name": "Membre"
+      },
+      {
+        "id": "1173310818503377038",
+        "name": "Craftbot"
+      }
+    ],
+    "membres": [
+      {
+        "id": "848591345781178378",
+        "name": "Kira watch",
+        "avatar": "https://cdn.discordapp.com/avatars/848591345781178378/66da8013fcb1b13648b7b36de53b7e3c.png?size=1024",
+        "roles": [
+          "Chef"
+        ],
+        "joined": "02/09/2024"
+      },
+      {
+        "id": "959453031655682098",
+        "name": "gounsh.",
+        "avatar": "https://cdn.discordapp.com/avatars/959453031655682098/7cfd568887d052545ea7cb21a48d7642.png?size=1024",
+        "roles": [
+          "Chef"
+        ],
+        "joined": "09/10/2023"
+      },
+      {
+        "id": "1124017250320527510",
+        "name": "gabriel",
+        "avatar": "https://cdn.discordapp.com/avatars/1124017250320527510/57df4418751250b1d670a533c7b6930f.png?size=1024",
+        "roles": [
+          "Membre"
+        ],
+        "joined": "28/10/2023"
+      }
+    ]
+  },
+  "1324360051820859472": {
+    "name": "Communauté de Katsuki",
+    "icon": "https://cdn.discordapp.com/icons/1324360051820859472/251c2c9aa3aaccaa42592795275bbbde.png?size=1024",
+    "members": 61,
+    "salons": [
+      {
+        "id": "1324361210644402228",
+        "name": "#📜・règlement"
+      },
+      {
+        "id": "1324361420783091773",
+        "name": "#📢・annonces"
+      },
+      {
+        "id": "1324432061397995656",
+        "name": "#🗳・sondages"
+      },
+      {
+        "id": "1324361511296176148",
+        "name": "#🎉・bienvenue"
+      },
+      {
+        "id": "1332779030377922570",
+        "name": "#🎮・niveau"
+      },
+      {
+        "id": "1384767056049733692",
+        "name": "#🔴annonce-live"
+      },
+      {
+        "id": "1324360939880976404",
+        "name": "#💬・général"
+      },
+      {
+        "id": "1324434477359038495",
+        "name": "#📷・partage"
+      },
+      {
+        "id": "1324431774196961362",
+        "name": "#🎭・mèmes"
+      },
+      {
+        "id": "1324456626899390484",
+        "name": "#💬・général-vip"
+      },
+      {
+        "id": "1346112555122298880",
+        "name": "#débloque-mwa"
+      },
+      {
+        "id": "1361793989153525791",
+        "name": "#🤖test-commande-bot"
+      },
+      {
+        "id": "1386711048861782096",
+        "name": "#cc"
+      },
+      {
+        "id": "1455628396242538578",
+        "name": "#❓・aide"
+      },
+      {
+        "id": "1332369932960141417",
+        "name": "#🤖・commande-bot"
+      },
+      {
+        "id": "1332690817243942972",
+        "name": "#🎉・rank"
+      },
+      {
+        "id": "1477430260118323434",
+        "name": "#animation"
+      },
+      {
+        "id": "1332770319810826314",
+        "name": "#📺・discussions-anime"
+      },
+      {
+        "id": "1332772465650172025",
+        "name": "#🌀・anime-et-manga"
+      },
+      {
+        "id": "1333055165590274201",
+        "name": "#🌍・international"
+      },
+      {
+        "id": "1332380294505959424",
+        "name": "#📣・publicité"
+      },
+      {
+        "id": "1332388074281504799",
+        "name": "#🎵・musique"
+      },
+      {
+        "id": "1332388715422683166",
+        "name": "#🖌・création"
+      },
+      {
+        "id": "1452296682254504139",
+        "name": "#🎹・release-of-pounoumane"
+      },
+      {
+        "id": "1332775657679224852",
+        "name": "#🔇・no-micro"
+      },
+      {
+        "id": "1324461244832415844",
+        "name": "#❓・aide"
+      },
+      {
+        "id": "1324432802321666080",
+        "name": "#🏎・mario-kart"
+      },
+      {
+        "id": "1324432711447871618",
+        "name": "#🌟・super-smash-bros"
+      },
+      {
+        "id": "1324432835469381682",
+        "name": "#🐻・animal-crossing"
+      },
+      {
+        "id": "1324432918617133076",
+        "name": "#🧩・zelda"
+      },
+      {
+        "id": "1324432989261791244",
+        "name": "#⭐・pokémon"
+      },
+      {
+        "id": "1324460785463988285",
+        "name": "#⛏・minecraft"
+      },
+      {
+        "id": "1332775996671266959",
+        "name": "#📜・règles-internes"
+      },
+      {
+        "id": "1332776063083741318",
+        "name": "#💬・suggestions-staff"
+      },
+      {
+        "id": "1418946280327217243",
+        "name": "#🛠・karcraft"
+      },
+      {
+        "id": "1419382534147539076",
+        "name": "#karkraft-v2"
+      },
+      {
+        "id": "1332775105897435197",
+        "name": "#🛠・gestion-serveur"
+      },
+      {
+        "id": "1324435342585106443",
+        "name": "#📝・rapports-suivi"
+      },
+      {
+        "id": "1324435370061992087",
+        "name": "#🤖・configuration-bots"
+      },
+      {
+        "id": "1332775079721042001",
+        "name": "#🗣・discussion-staff"
+      },
+      {
+        "id": "1332775130761269328",
+        "name": "#📅・planification"
+      },
+      {
+        "id": "1360296531550539938",
+        "name": "#🛠・infos-discord"
+      },
+      {
+        "id": "1474026174329131161",
+        "name": "#transcription-ticket"
+      },
+      {
+        "id": "1332376445678522408",
+        "name": "#🤖・logs-économies-serv"
+      },
+      {
+        "id": "1332403085045403751",
+        "name": "#🤖・logs-draftbot"
+      },
+      {
+        "id": "1360661780040520050",
+        "name": "#🧪・test-bot"
+      },
+      {
+        "id": "1360661832733561023",
+        "name": "#🌐・général-bot"
+      },
+      {
+        "id": "1479966488185012317",
+        "name": "#❓・aide"
+      }
+    ],
+    "categories": [
+      {
+        "id": "1324361105166045224",
+        "name": "📁 Information"
+      },
+      {
+        "id": "1324360911460241511",
+        "name": "📁 Discussion général"
+      },
+      {
+        "id": "1332369704349601853",
+        "name": "📁 BOT"
+      },
+      {
+        "id": "1477430577253843055",
+        "name": "📁 coins des animations"
+      },
+      {
+        "id": "1332768579346632735",
+        "name": "📁 🎥 Univers Anime"
+      },
+      {
+        "id": "1333058395183386695",
+        "name": "📁 Espace communautaire"
+      },
+      {
+        "id": "1330542795966124175",
+        "name": "📁 Vocaux"
+      },
+      {
+        "id": "1359235136901873834",
+        "name": "📁 Bureau Admin"
+      },
+      {
+        "id": "1324461174753857607",
+        "name": "📁 support et aide"
+      },
+      {
+        "id": "1324432350058119290",
+        "name": "📁 coin gaming"
+      },
+      {
+        "id": "1332775464246186034",
+        "name": "📁 👑 Catégorie : Staff - Informations"
+      },
+      {
+        "id": "1332774793702801449",
+        "name": "📁 ⚙ Catégorie : Staff - Gestion"
+      },
+      {
+        "id": "1332773727242289223",
+        "name": "📁 Logs"
+      },
+      {
+        "id": "1360660063068623039",
+        "name": "📁 Chocobot"
+      },
+      {
+        "id": "1474023956175519928",
+        "name": "📁 Ticket"
+      }
+    ],
+    "roles": [
+      {
+        "id": "1332357170007642132",
+        "name": "Bot"
+      },
+      {
+        "id": "1333080616299663472",
+        "name": "Fondateur"
+      },
+      {
+        "id": "1324437082227212290",
+        "name": "Administrateur"
+      },
+      {
+        "id": "1324438544248471552",
+        "name": "Modération"
+      },
+      {
+        "id": "1470880500133400774",
+        "name": "Modérateur-test"
+      },
+      {
+        "id": "1470876838833160192",
+        "name": "Pause staff"
+      },
+      {
+        "id": "1333072847320518656",
+        "name": "Staff"
+      },
+      {
+        "id": "1454951116696588503",
+        "name": "Policier du Dimanche"
+      },
+      {
+        "id": "1333079770233045042",
+        "name": "🌟"
+      },
+      {
+        "id": "1333079932171190294",
+        "name": "🌟 🌟"
+      },
+      {
+        "id": "1333080252108505139",
+        "name": "🌟 🌟 🌟"
+      },
+      {
+        "id": "1477404751808167966",
+        "name": "Animateur"
+      },
+      {
+        "id": "1324466800376811642",
+        "name": "Amis de Katsuki"
+      },
+      {
+        "id": "1328059346424172595",
+        "name": "Membre"
+      },
+      {
+        "id": "1324439982793949217",
+        "name": "DraftBot"
+      },
+      {
+        "id": "1346114668275433473",
+        "name": "créateur de musique"
+      },
+      {
+        "id": "1332403980919373986",
+        "name": "Créateur de contenu"
+      },
+      {
+        "id": "1451877331311530126",
+        "name": "Avocat de Katsuki"
+      },
+      {
+        "id": "1332370672923574385",
+        "name": "rôle personalisé"
+      },
+      {
+        "id": "1361067492348395651",
+        "name": "🎖️ Spécial"
+      },
+      {
+        "id": "1458230517060075521",
+        "name": "50eme membre"
+      },
+      {
+        "id": "1332381348001874044",
+        "name": "Rank E"
+      },
+      {
+        "id": "1332381385658335284",
+        "name": "Rank D"
+      },
+      {
+        "id": "1332381378729345147",
+        "name": "Rank C"
+      },
+      {
+        "id": "1332381461512327189",
+        "name": "Rank B"
+      },
+      {
+        "id": "1479188149778387055",
+        "name": "Sortie"
+      },
+      {
+        "id": "1332381489421357066",
+        "name": "Rank A"
+      },
+      {
+        "id": "1332381521708974142",
+        "name": "Rank S"
+      },
+      {
+        "id": "1332691762791321761",
+        "name": "Rank Z"
+      },
+      {
+        "id": "1324436705951879194",
+        "name": "Dyno"
+      },
+      {
+        "id": "1332371396877352983",
+        "name": "UnbelievaBoat"
+      },
+      {
+        "id": "1343357910373105705",
+        "name": "Server Booster"
+      },
+      {
+        "id": "1362117634057044221",
+        "name": "ChocoBot"
+      },
+      {
+        "id": "1429470919331545240",
+        "name": "Annonce live"
+      },
+      {
+        "id": "1443508420194992210",
+        "name": "Vidéaste"
+      },
+      {
+        "id": "1443647098816823336",
+        "name": "Twitch Subscriber"
+      },
+      {
+        "id": "1443647098816823337",
+        "name": "Twitch Subscriber: Tier 1"
+      },
+      {
+        "id": "1443647098816823338",
+        "name": "Twitch Subscriber: Tier 2"
+      },
+      {
+        "id": "1443647098816823339",
+        "name": "Twitch Subscriber: Tier 3"
+      },
+      {
+        "id": "1474023043323134076",
+        "name": "TicketTac"
+      },
+      {
+        "id": "1477810743356166157",
+        "name": "Sapphire"
+      },
+      {
+        "id": "1477813351634702480",
+        "name": "VoiceStats"
+      },
+      {
+        "id": "1479203935704055939",
+        "name": "spécial"
+      }
+    ],
+    "membres": [
+      {
+        "id": "1402597790713905248",
+        "name": "🎁👮  Ricktifier/riku",
+        "avatar": "https://cdn.discordapp.com/avatars/1402597790713905248/8304df9c0fbaace9d1d5d7fa03ada661.png?size=1024",
+        "roles": [
+          "Rank D",
+          "Rank E",
+          "Membre",
+          "🌟 🌟 🌟",
+          "Staff",
+          "Administrateur"
+        ],
+        "joined": "11/02/2026"
+      },
+      {
+        "id": "971425356676493342",
+        "name": "🎁Katsuking[Pommestuki]",
+        "avatar": "https://cdn.discordapp.com/guilds/1324360051820859472/users/971425356676493342/avatars/fa51bf845c2f198be93053be338a6571.png?size=1024",
+        "roles": [
+          "spécial",
+          "Twitch Subscriber: Tier 3",
+          "Twitch Subscriber",
+          "Vidéaste",
+          "Annonce live",
+          "Rank A",
+          "Sortie",
+          "🎖️ Spécial",
+          "Créateur de contenu",
+          "Staff",
+          "Fondateur"
+        ],
+        "joined": "02/01/2025"
+      },
+      {
+        "id": "1138097819333443675",
+        "name": "shadow/👾",
+        "avatar": "https://cdn.discordapp.com/avatars/1138097819333443675/79c5d300083ae67cee149bf62c6fe5fd.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Créateur de contenu",
+          "Membre"
+        ],
+        "joined": "28/02/2025"
+      },
+      {
+        "id": "1152951669143916604",
+        "name": "Ewinda",
+        "avatar": "https://cdn.discordapp.com/avatars/1152951669143916604/6ec4c16c239047cd395980bdd7c31567.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "10/10/2025"
+      },
+      {
+        "id": "1372438041842552902",
+        "name": "lyam",
+        "avatar": "https://cdn.discordapp.com/embed/avatars/3.png",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "06/02/2026"
+      },
+      {
+        "id": "772028644516298802",
+        "name": "POUNOUMANE",
+        "avatar": "https://cdn.discordapp.com/avatars/772028644516298802/c833ce93dfd2eb32c092b5d2833ab06c.png?size=1024",
+        "roles": [
+          "Sortie",
+          "Rank D",
+          "Rank E",
+          "🎖️ Spécial",
+          "Créateur de contenu",
+          "Membre",
+          "Amis de Katsuki",
+          "🌟 🌟",
+          "Staff",
+          "Modération"
+        ],
+        "joined": "01/03/2026"
+      },
+      {
+        "id": "1248307929929486417",
+        "name": "MacQueen (189/202🍓)",
+        "avatar": "https://cdn.discordapp.com/avatars/1248307929929486417/d12c3d946ea8c11d1187690b58f17898.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "01/03/2026"
+      },
+      {
+        "id": "1242081087945969696",
+        "name": "Imran",
+        "avatar": "https://cdn.discordapp.com/avatars/1242081087945969696/17fa3e91722eb0c59b4ada9a675268f5.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "03/02/2025"
+      },
+      {
+        "id": "1278458817759416380",
+        "name": "nostrad0",
+        "avatar": "https://cdn.discordapp.com/avatars/1278458817759416380/3f05ba32aa4184bc449353f645788941.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "23/11/2025"
+      },
+      {
+        "id": "1323077260143493121",
+        "name": "ZsM",
+        "avatar": "https://cdn.discordapp.com/avatars/1323077260143493121/68498de741fe039aca63f65be92fdd83.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "06/12/2025"
+      },
+      {
+        "id": "1177675638128267284",
+        "name": "BloraMc²",
+        "avatar": "https://cdn.discordapp.com/avatars/1177675638128267284/a_2e8b017422e905dc3ca38c4e02d37778.gif?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "30/06/2025"
+      },
+      {
+        "id": "1357323574825848902",
+        "name": "Lotakieth",
+        "avatar": "https://cdn.discordapp.com/avatars/1357323574825848902/5b41b3693c780f5e67dd193b0397baf9.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "13/05/2025"
+      },
+      {
+        "id": "1262450077272903790",
+        "name": "Blakyseven_try",
+        "avatar": "https://cdn.discordapp.com/avatars/1262450077272903790/3a9cd2e347f496994f6ae548958c0233.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "02/02/2026"
+      },
+      {
+        "id": "1462219747952168960",
+        "name": "Foxou2.0",
+        "avatar": "https://cdn.discordapp.com/avatars/1462219747952168960/11a8b677baf7fc9b3417f8978f80a502.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "17/01/2026"
+      },
+      {
+        "id": "1162459204158750780",
+        "name": "ianou68 ツ (188/202🍓)",
+        "avatar": "https://cdn.discordapp.com/avatars/1162459204158750780/2be31753e5f8d782a0a813fc93819416.png?size=1024",
+        "roles": [
+          "Rank E",
+          "🎖️ Spécial",
+          "Membre",
+          "Animateur"
+        ],
+        "joined": "20/02/2026"
+      },
+      {
+        "id": "848591345781178378",
+        "name": "Discord",
+        "avatar": "https://cdn.discordapp.com/avatars/848591345781178378/66da8013fcb1b13648b7b36de53b7e3c.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank D",
+          "Rank E",
+          "🎖️ Spécial",
+          "Membre",
+          "🌟 🌟 🌟",
+          "Administrateur"
+        ],
+        "joined": "02/01/2025"
+      },
+      {
+        "id": "1213612585778286632",
+        "name": "Noxen",
+        "avatar": "https://cdn.discordapp.com/avatars/1213612585778286632/5ab7d7a94aed1f9e1f6959e1197a5fc6.png?size=1024",
+        "roles": [
+          "Rank D",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "22/12/2025"
+      },
+      {
+        "id": "450698380826509313",
+        "name": "Kayzo",
+        "avatar": "https://cdn.discordapp.com/avatars/450698380826509313/d0d5e35ab9beedce439e83d68d93531a.png?size=1024",
+        "roles": [
+          "Rank E",
+          "50eme membre",
+          "Membre"
+        ],
+        "joined": "05/01/2026"
+      },
+      {
+        "id": "1400463718428442695",
+        "name": "gounsh_",
+        "avatar": "https://cdn.discordapp.com/avatars/1400463718428442695/411dd197ded584c04c95efa7de55014d.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre",
+          "Amis de Katsuki"
+        ],
+        "joined": "23/11/2025"
+      },
+      {
+        "id": "1244303308751896661",
+        "name": "Narcisly",
+        "avatar": "https://cdn.discordapp.com/avatars/1244303308751896661/8de76457f1f579c9c3d1f63cd38b4c2b.png?size=1024",
+        "roles": [
+          "Rank D",
+          "Rank E",
+          "🎖️ Spécial",
+          "Membre",
+          "Amis de Katsuki"
+        ],
+        "joined": "24/10/2025"
+      },
+      {
+        "id": "1301449532172795926",
+        "name": "Foxou {mcdo]",
+        "avatar": "https://cdn.discordapp.com/avatars/1301449532172795926/1d39de493d9b6c1ededfdd3f8060dbb8.png?size=1024",
+        "roles": [
+          "Rank C",
+          "Rank E",
+          "🎖️ Spécial",
+          "Membre"
+        ],
+        "joined": "10/02/2026"
+      },
+      {
+        "id": "1123519812862222407",
+        "name": "fande merdecraft/fort en anim",
+        "avatar": "https://cdn.discordapp.com/avatars/1123519812862222407/a1f370d083d19955bcf9ac24397bbb6d.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "28/02/2025"
+      },
+      {
+        "id": "1384615647777914920",
+        "name": "natbaze",
+        "avatar": "https://cdn.discordapp.com/avatars/1384615647777914920/5aa04cfafebf1008bd4d09261a7e04df.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "03/03/2026"
+      },
+      {
+        "id": "1167492796295413920",
+        "name": "Maxlware",
+        "avatar": "https://cdn.discordapp.com/avatars/1167492796295413920/5ccc40c733ab513ef0990bcc7f796d35.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "🎖️ Spécial",
+          "Membre"
+        ],
+        "joined": "18/07/2025"
+      },
+      {
+        "id": "1307362227489214508",
+        "name": "Romsko_LMC",
+        "avatar": "https://cdn.discordapp.com/avatars/1307362227489214508/2a8f1065657e8f76e5ec79a6de55e534.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre",
+          "Amis de Katsuki"
+        ],
+        "joined": "28/02/2025"
+      },
+      {
+        "id": "968857802342809610",
+        "name": "Uta Forever/new Genesis",
+        "avatar": "https://cdn.discordapp.com/avatars/968857802342809610/2fd2c8bdd161f7e9d83c34f1d062aa95.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "15/02/2026"
+      },
+      {
+        "id": "1030377064538308608",
+        "name": "sibilix",
+        "avatar": "https://cdn.discordapp.com/avatars/1030377064538308608/4f33382906997b95358c7ad6620d09a4.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "31/05/2025"
+      },
+      {
+        "id": "1056638127743180923",
+        "name": "Leon",
+        "avatar": "https://cdn.discordapp.com/avatars/1056638127743180923/7b86c4542ce430f7c93a92d85a989a7c.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "22/11/2025"
+      },
+      {
+        "id": "877505127668396053",
+        "name": "Kirbenzo",
+        "avatar": "https://cdn.discordapp.com/avatars/877505127668396053/9954f88e31c2c8a660c885b814510f0c.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "27/02/2026"
+      },
+      {
+        "id": "1243675576200331326",
+        "name": "welicoozz",
+        "avatar": "https://cdn.discordapp.com/avatars/1243675576200331326/166c86973094a32a0564a9ad20d99815.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "26/01/2025"
+      },
+      {
+        "id": "1434533025860943884",
+        "name": "Narcisly",
+        "avatar": "https://cdn.discordapp.com/avatars/1434533025860943884/19366f99f66cffb79230bceb9439e88e.png?size=1024",
+        "roles": [
+          "Rank D",
+          "Rank E",
+          "Membre",
+          "Amis de Katsuki"
+        ],
+        "joined": "03/11/2025"
+      },
+      {
+        "id": "1332113593772019754",
+        "name": "Katsouko_yt",
+        "avatar": "https://cdn.discordapp.com/avatars/1332113593772019754/6ba34f5038871010cfcd168a9ca0dbc9.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "15/11/2025"
+      },
+      {
+        "id": "1056703384364798093",
+        "name": "꧁🧿🥊 Jeremie~Blue Eyes 🥊🧿꧂",
+        "avatar": "https://cdn.discordapp.com/avatars/1056703384364798093/6a85bacb6c8608448981296b7d0a9a24.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "26/01/2025"
+      },
+      {
+        "id": "1142182601789030480",
+        "name": "Enzo",
+        "avatar": "https://cdn.discordapp.com/avatars/1142182601789030480/f9f9d04e19f0e2a29b478c8da3ebd216.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "03/12/2025"
+      },
+      {
+        "id": "1470388044795216124",
+        "name": "Marwarzk2026",
+        "avatar": "https://cdn.discordapp.com/embed/avatars/4.png",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "11/02/2026"
+      },
+      {
+        "id": "1357382122091843725",
+        "name": "KROOKZMANE",
+        "avatar": "https://cdn.discordapp.com/avatars/1357382122091843725/1899990cd73792a37bc57c3877323ecf.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "18/10/2025"
+      },
+      {
+        "id": "1460977723202601107",
+        "name": "Aru",
+        "avatar": "https://cdn.discordapp.com/avatars/1460977723202601107/f36bc3c9f045f827d1244ea86894b8c0.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "08/02/2026"
+      },
+      {
+        "id": "447000374264594434",
+        "name": "quire",
+        "avatar": "https://cdn.discordapp.com/avatars/447000374264594434/8cbc7abd3bf4599db518e5da438d14ac.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "23/02/2025"
+      },
+      {
+        "id": "1136195691128041482",
+        "name": "Raf235",
+        "avatar": "https://cdn.discordapp.com/avatars/1136195691128041482/e39bd6fe436ba5ebaec49b54a5b697ba.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "15/07/2025"
+      },
+      {
+        "id": "1214239359935709235",
+        "name": "Maël",
+        "avatar": "https://cdn.discordapp.com/avatars/1214239359935709235/5445ffd7ffb201a98393cbdf684ea4b1.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "07/12/2025"
+      },
+      {
+        "id": "858766645681324052",
+        "name": "𝑷𝑯𝑶𝑬𝑵𝑰𝑿",
+        "avatar": "https://cdn.discordapp.com/avatars/858766645681324052/2bc71c700b5b477b39969e5235a0a46b.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "25/01/2025"
+      },
+      {
+        "id": "1249396254643978244",
+        "name": "En recherche de ça fuite",
+        "avatar": "https://cdn.discordapp.com/avatars/1249396254643978244/64b0b2d3bccccfdd65e9b406a834ffc3.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank D",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "06/08/2025"
+      },
+      {
+        "id": "1330902149193924708",
+        "name": "Manarzk",
+        "avatar": "https://cdn.discordapp.com/avatars/1330902149193924708/329bb977703f26239086f6d18c014cf7.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "07/02/2026"
+      },
+      {
+        "id": "1043664267850825838",
+        "name": "toonday7",
+        "avatar": "https://cdn.discordapp.com/embed/avatars/4.png",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "06/12/2025"
+      },
+      {
+        "id": "1389906809187471361",
+        "name": "Leran",
+        "avatar": "https://cdn.discordapp.com/avatars/1389906809187471361/05e8cb015857392cf72dd70ceda01a9a.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "12/07/2025"
+      },
+      {
+        "id": "1206245732726612060",
+        "name": "BlockExposed",
+        "avatar": "https://cdn.discordapp.com/avatars/1206245732726612060/9ff0b9e662326b075c81e4b45fc3355b.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "23/02/2025"
+      },
+      {
+        "id": "1219175857978081290",
+        "name": "Star",
+        "avatar": "https://cdn.discordapp.com/avatars/1219175857978081290/03a61915c9453e53b7db597a3e1e3a6c.png?size=1024",
+        "roles": [
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "16/01/2026"
+      },
+      {
+        "id": "792112500786855996",
+        "name": "Dark_koro",
+        "avatar": "https://cdn.discordapp.com/avatars/792112500786855996/840653a08b9ef90ea283ca5edacbf40a.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "16/06/2025"
+      },
+      {
+        "id": "1306351028467400805",
+        "name": "Progamer",
+        "avatar": "https://cdn.discordapp.com/avatars/1306351028467400805/9160868814738db6ce6182d3baea0574.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Membre"
+        ],
+        "joined": "22/01/2025"
+      },
+      {
+        "id": "1194655029274087505",
+        "name": "CismuYTB",
+        "avatar": "https://cdn.discordapp.com/avatars/1194655029274087505/f44059dde883cf17773a98d9e750304f.png?size=1024",
+        "roles": [
+          "Annonce live",
+          "Rank E",
+          "Membre"
+        ],
+        "joined": "28/02/2025"
+      },
+      {
+        "id": "1476671644217901240",
+        "name": "Rosa",
+        "avatar": "https://cdn.discordapp.com/avatars/1476671644217901240/5e02273896d50daac549cb8166073de8.png?size=1024",
+        "roles": [
+          "Rank E",
+          "🎖️ Spécial",
+          "Membre"
+        ],
+        "joined": "26/02/2026"
+      },
+      {
+        "id": "956640561547329548",
+        "name": "capybara___orange",
+        "avatar": "https://cdn.discordapp.com/avatars/956640561547329548/769d70aec2112020c14ee3711baa0067.png?size=1024",
+        "roles": [
+          "Rank E",
+          "🎖️ Spécial",
+          "Membre"
+        ],
+        "joined": "15/02/2026"
+      }
+    ]
+  },
+  "1477435511370023003": {
+    "name": "Serveur de Kira watch",
+    "icon": null,
+    "members": 3,
+    "salons": [
+      {
+        "id": "1477435511370023006",
+        "name": "#général"
+      },
+      {
+        "id": "1478729435774587064",
+        "name": "#bievenue"
+      },
+      {
+        "id": "1478800357705384149",
+        "name": "#logs"
+      },
+      {
+        "id": "1479238077217247363",
+        "name": "#aréroport"
+      }
+    ],
+    "categories": [
+      {
+        "id": "1477435511370023004",
+        "name": "📁 Salons textuels"
+      },
+      {
+        "id": "1477435511370023005",
+        "name": "📁 Salons vocaux"
+      }
+    ],
+    "roles": [
+      {
+        "id": "1478468090596425728",
+        "name": "JUL"
+      },
+      {
+        "id": "1478754224308490280",
+        "name": "jeux de rêole"
+      },
+      {
+        "id": "1478862778675630132",
+        "name": "Karcraft"
+      },
+      {
+        "id": "1479914735460683922",
+        "name": "ChocoBot"
+      },
+      {
+        "id": "1479967841263550464",
+        "name": "VIP"
+      }
+    ],
+    "membres": [
+      {
+        "id": "848591345781178378",
+        "name": "Kira watch",
+        "avatar": "https://cdn.discordapp.com/avatars/848591345781178378/66da8013fcb1b13648b7b36de53b7e3c.png?size=1024",
+        "roles": [],
+        "joined": "28/02/2026"
+      }
+    ]
+  }
+}

@@ -17,6 +17,7 @@ from config import TOKEN
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
+intents.voice_states = True  # ← NÉCESSAIRE pour la musique
 bot = commands.Bot(command_prefix="!", intents=intents)
 bot.snipe_cache = {}
 
@@ -28,8 +29,11 @@ async def charger_cogs():
     for fichier in os.listdir("./cogs"):
         if fichier.endswith(".py") and fichier != "__init__.py":
             nom = fichier[:-3]
-            await bot.load_extension(f"cogs.{nom}")
-            print(f"  ✅ Module chargé : cogs/{fichier}")
+            try:
+                await bot.load_extension(f"cogs.{nom}")
+                print(f"  ✅ Module chargé : cogs/{fichier}")
+            except Exception as e:
+                print(f"  ❌ Erreur {fichier} : {e}")
 
 # ══════════════════════════════════════════════
 # EXPOSITION DES DONNÉES POUR LE DASHBOARD

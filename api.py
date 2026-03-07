@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DISCORD_CLIENT_ID     = "1479239529197076691"
+DISCORD_CLIENT_ID     = os.getenv("DISCORD_CLIENT_ID", "1479239529197076691")
 DISCORD_CLIENT_SECRET = os.getenv("DISCORD_CLIENT_SECRET", "")
 DISCORD_REDIRECT_URI  = "http://localhost:8000/callback"
 DISCORD_API           = "https://discord.com/api/v10"

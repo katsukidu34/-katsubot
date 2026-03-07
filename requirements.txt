@@ -5,3 +5,5 @@ requests
 aiofiles
 python-dotenv
 pymongo
+yt-dlp
+PyNaCl

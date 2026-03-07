@@ -1,200 +1,300 @@
 """
-cogs/reaction_role.py — Rôles via réactions
-=============================================
-Commandes : /reaction_role_add, /reaction_role_remove, /reaction_role_list
-Un membre clique sur une réaction → il obtient/perd le rôle automatiquement.
-Anti-spam : cooldown 3s par membre + vérification si le rôle est déjà attribué.
+cogs/reaction_role.py — Rôles via boutons (Button Roles)
+==========================================================
+/role-panel   → Crée un panel avec boutons pour obtenir des rôles
+/role-add     → Ajoute un bouton rôle à un panel existant
+/role-remove  → Retire un bouton rôle d'un panel
+/role-list    → Liste tous les panels du serveur
+
+Plus moderne et fiable que les reaction roles classiques !
 """
 
-import time
 import discord
 from discord import app_commands
 from discord.ext import commands
+from datetime import datetime
 
-from config import charger_config, sauvegarder_config
+from config import get_config, set_config
 
 
 # ══════════════════════════════════════════════
-# FONCTIONS
+# HELPERS
 # ══════════════════════════════════════════════
 
-def get_reaction_roles(guild_id: int) -> dict:
-    """Retourne les reaction roles du serveur. Format : {message_id: {emoji: role_name}}"""
-    config = charger_config()
-    return config.get(str(guild_id), {}).get("reaction_roles", {})
+def get_panels(guild_id: int) -> dict:
+    return get_config(guild_id).get("reaction_roles", {})
 
-def set_reaction_roles(guild_id: int, data: dict):
-    """Sauvegarde les reaction roles."""
-    config = charger_config()
-    gid = str(guild_id)
-    if gid not in config:
-        config[gid] = {}
-    config[gid]["reaction_roles"] = data
-    sauvegarder_config(config)
+def save_panels(guild_id: int, panels: dict):
+    set_config(guild_id, "reaction_roles", panels)
+
+
+# ══════════════════════════════════════════════
+# VUE DYNAMIQUE (boutons rôles)
+# ══════════════════════════════════════════════
+
+class VueRoles(discord.ui.View):
+    def __init__(self, panel_id: str, boutons: list):
+        super().__init__(timeout=None)
+        for b in boutons:
+            self.add_item(BoutonRole(
+                role_id    = b["role_id"],
+                label      = b["label"],
+                emoji      = b.get("emoji", "🎭"),
+                couleur    = b.get("couleur", "blurple"),
+                panel_id   = panel_id,
+            ))
+
+
+COULEURS = {
+    "blurple": discord.ButtonStyle.primary,
+    "vert":    discord.ButtonStyle.success,
+    "rouge":   discord.ButtonStyle.danger,
+    "gris":    discord.ButtonStyle.secondary,
+}
+
+
+class BoutonRole(discord.ui.Button):
+    def __init__(self, role_id: int, label: str, emoji: str, couleur: str, panel_id: str):
+        super().__init__(
+            label     = label,
+            emoji     = emoji,
+            style     = COULEURS.get(couleur, discord.ButtonStyle.primary),
+            custom_id = f"role_{panel_id}_{role_id}",
+        )
+        self.role_id = role_id
+
+    async def callback(self, interaction: discord.Interaction):
+        role = interaction.guild.get_role(self.role_id)
+        if not role:
+            await interaction.response.send_message("❌ Ce rôle n'existe plus !", ephemeral=True)
+            return
+
+        if role in interaction.user.roles:
+            await interaction.user.remove_roles(role)
+            embed = discord.Embed(
+                description=f"❌ Le rôle **{role.name}** t'a été retiré.",
+                color=discord.Color.orange()
+            )
+        else:
+            await interaction.user.add_roles(role)
+            embed = discord.Embed(
+                description=f"✅ Tu as obtenu le rôle {role.mention} !",
+                color=discord.Color.green()
+            )
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 # ══════════════════════════════════════════════
 # COG
 # ══════════════════════════════════════════════
 
-COOLDOWN_SECONDS = 3  # Délai entre chaque action par membre
-
 class ReactionRole(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self._cooldowns: dict[int, float] = {}  # {user_id: timestamp}
-
-    def _check_cooldown(self, user_id: int) -> bool:
-        """Retourne True si le membre peut agir, False s'il est en cooldown."""
-        now = time.time()
-        last = self._cooldowns.get(user_id, 0)
-        if now - last < COOLDOWN_SECONDS:
-            return False
-        self._cooldowns[user_id] = now
-        return True
-
-    # ── Listeners ─────────────────────────────
 
     @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
-        """Donne le rôle quand un membre ajoute une réaction."""
-        if payload.user_id == self.bot.user.id:
-            return
+    async def on_ready(self):
+        """Recharge tous les panels au démarrage."""
+        for guild in self.bot.guilds:
+            panels = get_panels(guild.id)
+            for panel_id, panel in panels.items():
+                boutons = panel.get("boutons", [])
+                if boutons:
+                    self.bot.add_view(VueRoles(panel_id, boutons))
 
-        if not self._check_cooldown(payload.user_id):
-            return  # En cooldown, on ignore
+    # ── /role-panel ────────────────────────────
 
-        rr     = get_reaction_roles(payload.guild_id)
-        msg_id = str(payload.message_id)
-        emoji  = str(payload.emoji)
-
-        if msg_id not in rr or emoji not in rr[msg_id]:
-            return
-
-        guild  = self.bot.get_guild(payload.guild_id)
-        membre = guild.get_member(payload.user_id)
-        role   = discord.utils.get(guild.roles, name=rr[msg_id][emoji])
-
-        if membre and role:
-            if role in membre.roles:
-                return  # A déjà le rôle, on ignore
-
-            await membre.add_roles(role)
-            try:
-                await membre.send(f"✅ Tu as obtenu le rôle **{role.name}** sur **{guild.name}** !")
-            except discord.Forbidden:
-                pass  # DMs désactivés
-
-    @commands.Cog.listener()
-    async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
-        """Retire le rôle quand un membre enlève sa réaction."""
-        if not self._check_cooldown(payload.user_id):
-            return  # En cooldown, on ignore
-
-        rr     = get_reaction_roles(payload.guild_id)
-        msg_id = str(payload.message_id)
-        emoji  = str(payload.emoji)
-
-        if msg_id not in rr or emoji not in rr[msg_id]:
-            return
-
-        guild  = self.bot.get_guild(payload.guild_id)
-        membre = guild.get_member(payload.user_id)
-        role   = discord.utils.get(guild.roles, name=rr[msg_id][emoji])
-
-        if membre and role:
-            if role not in membre.roles:
-                return  # N'a pas le rôle, on ignore
-
-            await membre.remove_roles(role)
-            try:
-                await membre.send(f"❌ Tu as perdu le rôle **{role.name}** sur **{guild.name}** !")
-            except discord.Forbidden:
-                pass  # DMs désactivés
-
-    # ── /reaction_role_add ─────────────────────
-
-    @app_commands.command(name="reaction_role_add", description="Associe un emoji à un rôle sur un message")
+    @app_commands.command(name="role-panel", description="Crée un panel de sélection de rôles")
     @app_commands.describe(
-        message_id="L'ID du message",
-        emoji="L'emoji à utiliser",
-        role="Le rôle à attribuer"
+        titre="Titre du panel",
+        description="Description du panel",
+        couleur="Couleur de l'embed (blurple/vert/rouge/gris)"
     )
+    @app_commands.choices(couleur=[
+        app_commands.Choice(name="💜 Blurple", value="blurple"),
+        app_commands.Choice(name="💚 Vert",    value="vert"),
+        app_commands.Choice(name="❤️ Rouge",   value="rouge"),
+        app_commands.Choice(name="🩶 Gris",    value="gris"),
+    ])
     @app_commands.checks.has_permissions(administrator=True)
-    async def reaction_role_add(self, interaction: discord.Interaction, message_id: str, emoji: str, role: discord.Role):
-        rr     = get_reaction_roles(interaction.guild_id)
-        msg_id = message_id.strip()
+    async def role_panel(self, interaction: discord.Interaction, titre: str, description: str, couleur: str = "blurple"):
+        await interaction.response.defer(ephemeral=True)
+
+        COULEURS_EMBED = {
+            "blurple": discord.Color.blurple(),
+            "vert":    discord.Color.green(),
+            "rouge":   discord.Color.red(),
+            "gris":    discord.Color.greyple(),
+        }
+
+        embed = discord.Embed(
+            title       = titre,
+            description = description,
+            color       = COULEURS_EMBED.get(couleur, discord.Color.blurple()),
+            timestamp   = datetime.utcnow()
+        )
+        embed.set_footer(text=interaction.guild.name, icon_url=interaction.guild.icon.url if interaction.guild.icon else None)
+
+        # Panel vide au départ
+        msg = await interaction.channel.send(embed=embed, view=discord.ui.View())
+
+        # Sauvegarde
+        panels = get_panels(interaction.guild_id)
+        panel_id = str(msg.id)
+        panels[panel_id] = {
+            "message_id": msg.id,
+            "channel_id": interaction.channel_id,
+            "titre":      titre,
+            "boutons":    [],
+        }
+        save_panels(interaction.guild_id, panels)
+
+        await interaction.followup.send(
+            f"✅ Panel créé ! Utilise `/role-add` avec l'ID `{panel_id}` pour ajouter des rôles.",
+            ephemeral=True
+        )
+
+    # ── /role-add ──────────────────────────────
+
+    @app_commands.command(name="role-add", description="Ajoute un bouton rôle à un panel")
+    @app_commands.describe(
+        panel_id  = "L'ID du panel (message)",
+        role      = "Le rôle à attribuer",
+        label     = "Texte du bouton",
+        emoji     = "Emoji du bouton",
+        couleur   = "Couleur du bouton"
+    )
+    @app_commands.choices(couleur=[
+        app_commands.Choice(name="💜 Blurple", value="blurple"),
+        app_commands.Choice(name="💚 Vert",    value="vert"),
+        app_commands.Choice(name="❤️ Rouge",   value="rouge"),
+        app_commands.Choice(name="🩶 Gris",    value="gris"),
+    ])
+    @app_commands.checks.has_permissions(administrator=True)
+    async def role_add(self, interaction: discord.Interaction, panel_id: str, role: discord.Role, label: str, emoji: str = "🎭", couleur: str = "blurple"):
+        panels = get_panels(interaction.guild_id)
+
+        if panel_id not in panels:
+            await interaction.response.send_message("❌ Panel introuvable !", ephemeral=True)
+            return
+
+        panel   = panels[panel_id]
+        boutons = panel.get("boutons", [])
+
+        if len(boutons) >= 25:
+            await interaction.response.send_message("❌ Maximum 25 boutons par panel !", ephemeral=True)
+            return
+
+        if any(b["role_id"] == role.id for b in boutons):
+            await interaction.response.send_message("❌ Ce rôle est déjà dans le panel !", ephemeral=True)
+            return
+
+        boutons.append({
+            "role_id": role.id,
+            "label":   label,
+            "emoji":   emoji,
+            "couleur": couleur,
+        })
+        panel["boutons"] = boutons
+        save_panels(interaction.guild_id, panels)
+
+        # Met à jour le message
+        try:
+            canal = interaction.guild.get_channel(panel["channel_id"])
+            msg   = await canal.fetch_message(int(panel_id))
+            vue   = VueRoles(panel_id, boutons)
+            self.bot.add_view(vue)
+            await msg.edit(view=vue)
+        except Exception as e:
+            await interaction.response.send_message(f"❌ Impossible de mettre à jour le panel : {e}", ephemeral=True)
+            return
+
+        await interaction.response.send_message(
+            f"✅ Bouton **{label}** ({emoji}) ajouté pour le rôle {role.mention} !",
+            ephemeral=True
+        )
+
+    # ── /role-remove ───────────────────────────
+
+    @app_commands.command(name="role-remove", description="Retire un bouton rôle d'un panel")
+    @app_commands.describe(panel_id="L'ID du panel", role="Le rôle à retirer")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def role_remove(self, interaction: discord.Interaction, panel_id: str, role: discord.Role):
+        panels = get_panels(interaction.guild_id)
+
+        if panel_id not in panels:
+            await interaction.response.send_message("❌ Panel introuvable !", ephemeral=True)
+            return
+
+        panel   = panels[panel_id]
+        boutons = panel.get("boutons", [])
+        nouveaux = [b for b in boutons if b["role_id"] != role.id]
+
+        if len(nouveaux) == len(boutons):
+            await interaction.response.send_message("❌ Ce rôle n'est pas dans le panel !", ephemeral=True)
+            return
+
+        panel["boutons"] = nouveaux
+        save_panels(interaction.guild_id, panels)
 
         try:
-            msg = await interaction.channel.fetch_message(int(msg_id))
-        except Exception:
-            await interaction.response.send_message(
-                "Message introuvable ! Assure-toi d'être dans le bon salon.", ephemeral=True
-            )
+            canal = interaction.guild.get_channel(panel["channel_id"])
+            msg   = await canal.fetch_message(int(panel_id))
+            vue   = VueRoles(panel_id, nouveaux) if nouveaux else discord.ui.View()
+            await msg.edit(view=vue)
+        except Exception as e:
+            await interaction.response.send_message(f"❌ Impossible de mettre à jour le panel : {e}", ephemeral=True)
             return
-
-        if msg_id not in rr:
-            rr[msg_id] = {}
-
-        rr[msg_id][emoji] = role.name
-        set_reaction_roles(interaction.guild_id, rr)
-
-        await msg.add_reaction(emoji)
 
         await interaction.response.send_message(
-            f"✅ Réaction **{emoji}** associée au rôle **{role.name}** !", ephemeral=True
+            f"✅ Bouton pour **{role.name}** retiré du panel !",
+            ephemeral=True
         )
 
-    # ── /reaction_role_remove ──────────────────
+    # ── /role-list ─────────────────────────────
 
-    @app_commands.command(name="reaction_role_remove", description="Supprime une association emoji/rôle")
-    @app_commands.describe(message_id="L'ID du message", emoji="L'emoji à supprimer")
+    @app_commands.command(name="role-list", description="Liste tous les panels de rôles du serveur")
     @app_commands.checks.has_permissions(administrator=True)
-    async def reaction_role_remove(self, interaction: discord.Interaction, message_id: str, emoji: str):
-        rr     = get_reaction_roles(interaction.guild_id)
-        msg_id = message_id.strip()
+    async def role_list(self, interaction: discord.Interaction):
+        panels = get_panels(interaction.guild_id)
 
-        if msg_id not in rr or emoji not in rr[msg_id]:
-            await interaction.response.send_message(
-                "Cette association n'existe pas !", ephemeral=True
-            )
+        if not panels:
+            await interaction.response.send_message("❌ Aucun panel configuré !", ephemeral=True)
             return
 
-        del rr[msg_id][emoji]
-        if not rr[msg_id]:
-            del rr[msg_id]
-        set_reaction_roles(interaction.guild_id, rr)
-
-        await interaction.response.send_message(
-            f"✅ Association **{emoji}** supprimée !", ephemeral=True
+        embed = discord.Embed(
+            title     = "🎭 Panels de rôles",
+            color     = discord.Color.blurple(),
+            timestamp = datetime.utcnow()
         )
 
-    # ── /reaction_role_list ────────────────────
+        for panel_id, panel in panels.items():
+            boutons = panel.get("boutons", [])
+            if boutons:
+                lignes = []
+                for b in boutons:
+                    role = interaction.guild.get_role(b["role_id"])
+                    nom  = role.mention if role else f"~~{b['label']}~~ (supprimé)"
+                    lignes.append(f"{b.get('emoji','🎭')} {b['label']} → {nom}")
+                valeur = "\n".join(lignes)
+            else:
+                valeur = "*Aucun bouton*"
 
-    @app_commands.command(name="reaction_role_list", description="Liste tous les reaction roles du serveur")
-    @app_commands.checks.has_permissions(administrator=True)
-    async def reaction_role_list(self, interaction: discord.Interaction):
-        rr = get_reaction_roles(interaction.guild_id)
-
-        if not rr:
-            await interaction.response.send_message(
-                "Aucun reaction role configuré !", ephemeral=True
+            embed.add_field(
+                name   = f"📋 {panel.get('titre', 'Panel')} (ID: {panel_id})",
+                value  = valeur,
+                inline = False
             )
-            return
-
-        embed = discord.Embed(title="🎭 Reaction Roles", color=discord.Color.blurple())
-        for msg_id, emojis in rr.items():
-            valeur = "\n".join(f"{e} → **{r}**" for e, r in emojis.items())
-            embed.add_field(name=f"Message {msg_id}", value=valeur, inline=False)
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
     async def cog_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
         if isinstance(error, app_commands.MissingPermissions):
-            await interaction.response.send_message("Tu n'as pas la permission !", ephemeral=True)
+            await interaction.response.send_message("❌ Tu n'as pas la permission !", ephemeral=True)
         else:
-            await interaction.response.send_message(f"Erreur : {error}", ephemeral=True)
+            await interaction.response.send_message(f"❌ Erreur : {error}", ephemeral=True)
 
 
 async def setup(bot: commands.Bot):

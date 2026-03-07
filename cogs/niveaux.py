@@ -19,12 +19,48 @@ class Niveaux(commands.Cog):
         self.vocal_sessions = {}
 
     def get_canal(self, guild, cle):
-        """Retourne le salon de logs pour une clé donnée."""
         cfg      = get_config(guild.id)
         salon_id = cfg.get(cle)
         if not salon_id:
             return None
         return guild.get_channel(int(salon_id))
+
+    # ── Listener bienvenue ─────────────────────
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member: discord.Member):
+        cfg = get_config(member.guild.id)
+        if not cfg["salon_bienvenue"]:
+            return
+        canal = member.guild.get_channel(int(cfg["salon_bienvenue"]))
+        if not canal:
+            return
+        couleurs = [discord.Color.green(), discord.Color.blurple(), discord.Color.gold(), discord.Color.purple()]
+        embed = discord.Embed(
+            title="👋 Nouveau membre !",
+            description=f"Bienvenue {member.mention} sur **{member.guild.name}** !\n\n"
+                        f"Tu es le **{member.guild.member_count}e membre** du serveur.\n"
+                        f"N'oublie pas de lire les règles et tape `/help` pour voir les commandes !",
+            color=random.choice(couleurs)
+        )
+        embed.set_thumbnail(url=member.display_avatar.url)
+        embed.set_footer(text=f"Compte créé le {member.created_at.strftime('%d/%m/%Y')}")
+        embed.add_field(name="📅 Arrivée", value=member.joined_at.strftime("%d/%m/%Y à %H:%M"), inline=True)
+        embed.add_field(name="🏷️ ID",     value=str(member.id),                                 inline=True)
+        await canal.send(content=f"Bienvenue {member.mention} !", embed=embed)
+
+        canal_log = self.get_canal(member.guild, "logs_membres")
+        if canal_log:
+            embed_log = discord.Embed(
+                description=f"{member.mention} a rejoint le serveur 🎉",
+                color=discord.Color.green(),
+                timestamp=discord.utils.utcnow()
+            )
+            embed_log.set_author(name=f"Arrivée — {member.display_name}", icon_url=member.display_avatar.url)
+            embed_log.add_field(name="📅 Compte créé le", value=member.created_at.strftime("%d/%m/%Y"), inline=True)
+            embed_log.add_field(name="🏷️ ID",             value=str(member.id),                         inline=True)
+            embed_log.set_footer(text=member.guild.name, icon_url=member.guild.icon.url if member.guild.icon else None)
+            await canal_log.send(embed=embed_log)
 
     # ── Listener vocal ─────────────────────────
 
@@ -213,47 +249,6 @@ class Niveaux(commands.Cog):
                         await message.author.add_roles(role)
                         await message.channel.send(f"🎭 Tu as obtenu le rôle **{role.name}** !")
             sauvegarder_data(data)
-
-
-async def setup(bot: commands.Bot):
-    await bot.add_cog(Niveaux(bot))
-    # ── Listener bienvenue ─────────────────────
-
-    @commands.Cog.listener()
-    async def on_member_join(self, member: discord.Member):
-        cfg = get_config(member.guild.id)
-        if not cfg["salon_bienvenue"]:
-            return
-        canal = member.guild.get_channel(int(cfg["salon_bienvenue"]))
-        if not canal:
-            return
-        couleurs = [discord.Color.green(), discord.Color.blurple(), discord.Color.gold(), discord.Color.purple()]
-        embed = discord.Embed(
-            title="👋 Nouveau membre !",
-            description=f"Bienvenue {member.mention} sur **{member.guild.name}** !\n\n"
-                        f"Tu es le **{member.guild.member_count}e membre** du serveur.\n"
-                        f"N'oublie pas de lire les règles et tape `/help` pour voir les commandes !",
-            color=random.choice(couleurs)
-        )
-        embed.set_thumbnail(url=member.display_avatar.url)
-        embed.set_footer(text=f"Compte créé le {member.created_at.strftime('%d/%m/%Y')}")
-        embed.add_field(name="📅 Arrivée", value=member.joined_at.strftime("%d/%m/%Y à %H:%M"), inline=True)
-        embed.add_field(name="🏷️ ID",     value=str(member.id),                                 inline=True)
-        await canal.send(content=f"Bienvenue {member.mention} !", embed=embed)
-
-        # Log arrivée
-        canal_log = self.get_canal(member.guild, "logs_membres")
-        if canal_log:
-            embed_log = discord.Embed(
-                description=f"{member.mention} a rejoint le serveur 🎉",
-                color=discord.Color.green(),
-                timestamp=discord.utils.utcnow()
-            )
-            embed_log.set_author(name=f"Arrivée — {member.display_name}", icon_url=member.display_avatar.url)
-            embed_log.add_field(name="📅 Compte créé le", value=member.created_at.strftime("%d/%m/%Y"), inline=True)
-            embed_log.add_field(name="🏷️ ID",             value=str(member.id),                         inline=True)
-            embed_log.set_footer(text=member.guild.name, icon_url=member.guild.icon.url if member.guild.icon else None)
-            await canal_log.send(embed=embed_log)
 
     # ── /niveau ───────────────────────────────
 
