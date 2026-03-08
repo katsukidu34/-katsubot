@@ -1,25 +1,13 @@
-"""
-cogs/missions.py — Système de missions journalières
-=====================================================
-Commandes : /missions, /reward_claim
-Reset automatique à minuit via task.
-Notification quand une mission est complétée.
-Accès direct MongoDB (pas de charger_data global).
-"""
-
+# missions_json.py — Missions journalières avec stockage JSON
 import time
 import random
 import discord
-
-from datetime        import date, time as dtime
-from discord         import app_commands
-from discord.ext     import commands, tasks
-from config          import col_data, get_config
-
-
-# ══════════════════════════════════════════════
-# MISSIONS DISPONIBLES
-# ══════════════════════════════════════════════
+import json
+import os
+from datetime import date, time as dtime
+from discord import app_commands
+from discord.ext import commands, tasks
+from config import lire_json, ecrire_json, DATA_FILE
 
 MISSIONS = [
     {"id": "messages_10",  "nom": "Bavard",          "description": "Envoie 10 messages",    "type": "messages",  "objectif": 10,   "recompense": 50},
@@ -31,67 +19,65 @@ MISSIONS = [
     {"id": "reactions_5",  "nom": "Expressif",       "description": "Ajoute 5 réactions",    "type": "reactions", "objectif": 5,    "recompense": 40},
     {"id": "reactions_10", "nom": "Très expressif",  "description": "Ajoute 10 réactions",   "type": "reactions", "objectif": 10,   "recompense": 80},
 ]
-
 MISSIONS_INDEX = {m["id"]: m for m in MISSIONS}
 
+# ── Fonctions JSON pour remplacer MongoDB ──
+def _charger_data_json():
+    data = lire_json(DATA_FILE)
+    return data if isinstance(data, dict) else {}
 
-# ══════════════════════════════════════════════
-# HELPERS MONGODB DIRECTS
-# ══════════════════════════════════════════════
+def _sauvegarder_data_json(data: dict):
+    ecrire_json(DATA_FILE, data)
 
 def _get_doc(guild_id: int, user_id: int) -> dict:
-    """Récupère le document d'un joueur depuis MongoDB."""
+    data = _charger_data_json()
     gid, uid = str(guild_id), str(user_id)
-    return col_data.find_one({"guild_id": gid, "user_id": uid}, {"_id": 0}) or {}
-
+    if gid not in data:
+        data[gid] = {}
+    if uid not in data[gid]:
+        data[gid][uid] = {
+            "xp": 0,
+            "missions_date": "",
+            "missions": [],
+            "missions_progres": {},
+            "missions_claimed": [],
+            "missions_notifiees": [],
+        }
+    return data[gid][uid]
 
 def _save_missions(guild_id: int, user_id: int, fields: dict):
-    """Met à jour uniquement les champs missions en MongoDB."""
+    data = _charger_data_json()
     gid, uid = str(guild_id), str(user_id)
-    col_data.update_one(
-        {"guild_id": gid, "user_id": uid},
-        {"$set": {**fields, "guild_id": gid, "user_id": uid}},
-        upsert=True
-    )
-
+    if gid not in data:
+        data[gid] = {}
+    if uid not in data[gid]:
+        data[gid][uid] = {}
+    data[gid][uid].update(fields)
+    _sauvegarder_data_json(data)
 
 def _ensure_missions(guild_id: int, user_id: int) -> dict:
-    """
-    Vérifie si les missions du joueur sont à jour.
-    Si non (nouveau jour), génère 3 nouvelles missions.
-    Retourne le doc mis à jour.
-    """
-    doc   = _get_doc(guild_id, user_id)
+    doc = _get_doc(guild_id, user_id)
     today = str(date.today())
-
     if doc.get("missions_date") != today:
         choisies = random.sample(MISSIONS, 3)
         fields = {
-            "missions_date":      today,
-            "missions":           [m["id"] for m in choisies],
-            "missions_progres":   {m["id"]: 0 for m in choisies},
-            "missions_claimed":   [],
+            "missions_date": today,
+            "missions": [m["id"] for m in choisies],
+            "missions_progres": {m["id"]: 0 for m in choisies},
+            "missions_claimed": [],
             "missions_notifiees": [],
         }
         _save_missions(guild_id, user_id, fields)
         doc.update(fields)
-
     return doc
 
-
 def _progresser(guild_id: int, user_id: int, type_mission: str, valeur: int = 1) -> list[dict]:
-    """
-    Incrémente la progression d'un type de mission.
-    Retourne la liste des missions nouvellement complétées.
-    """
     doc = _ensure_missions(guild_id, user_id)
-
-    missions_ids    = doc.get("missions", [])
-    progres         = doc.get("missions_progres", {})
-    claimed         = doc.get("missions_claimed", [])
-    notifiees       = doc.get("missions_notifiees", [])
-    completees      = []
-    progres_updated = {}
+    missions_ids = doc.get("missions", [])
+    progres = doc.get("missions_progres", {})
+    claimed = doc.get("missions_claimed", [])
+    notifiees = doc.get("missions_notifiees", [])
+    completees = []
 
     for mid in missions_ids:
         m = MISSIONS_INDEX.get(mid)
@@ -99,26 +85,18 @@ def _progresser(guild_id: int, user_id: int, type_mission: str, valeur: int = 1)
             continue
         if mid in claimed or mid in notifiees:
             continue
-
-        ancien  = progres.get(mid, 0)
+        ancien = progres.get(mid, 0)
         nouveau = min(ancien + valeur, m["objectif"])
-        progres_updated[f"missions_progres.{mid}"] = nouveau
-
+        progres[mid] = nouveau
         if nouveau >= m["objectif"] and ancien < m["objectif"]:
             completees.append(m)
             notifiees.append(mid)
 
-    if progres_updated:
-        gid, uid = str(guild_id), str(user_id)
-        update = {**progres_updated}
-        if completees:
-            update["missions_notifiees"] = notifiees
-        col_data.update_one(
-            {"guild_id": gid, "user_id": uid},
-            {"$set": update},
-            upsert=True
-        )
-
+    # Sauvegarde les progrès
+    _save_missions(guild_id, user_id, {
+        "missions_progres": progres,
+        "missions_notifiees": notifiees
+    })
     return completees
 
 

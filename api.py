@@ -1,5 +1,5 @@
 """
-api.py — Serveur FastAPI pour KatsuBot Dashboard
+api.py — Serveur FastAPI pour KatsuBot Dashboard (JSON only)
 Lance avec : python -m uvicorn api:app --reload --port 8000
 """
 
@@ -9,25 +9,24 @@ from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Any, Optional
-import os, requests as req
-from datetime import datetime
+import os, requests as req, json
 from dotenv import load_dotenv
 
 load_dotenv()
 
-DISCORD_CLIENT_ID     = os.getenv("DISCORD_CLIENT_ID", "1479239529197076691")
+DISCORD_CLIENT_ID     = os.getenv("DISCORD_CLIENT_ID", "")
 DISCORD_CLIENT_SECRET = os.getenv("DISCORD_CLIENT_SECRET", "")
-DISCORD_REDIRECT_URI  = "http://localhost:8000/callback"
+DISCORD_REDIRECT_URI  = os.getenv("DISCORD_REDIRECT_URI", "http://localhost:8000/callback")
 DISCORD_API           = "https://discord.com/api/v10"
 
 sessions: dict = {}
 
 from config import (
-    col_data, col_config, col_logs, col_missions,
     CONFIG_DEFAUT, get_config, set_config,
-    ajouter_sanction, get_sanctions
+    ajouter_sanction, get_sanctions,
+    charger_data, sauvegarder_data, get_joueur,
+    charger_eco, get_compte, save_compte,
 )
-import json, os
 
 def lire_bot_data():
     if os.path.exists("bot_data.json"):
@@ -51,15 +50,6 @@ class ReactionRole(BaseModel):
     message_id: str
     emoji: str
     role: str
-
-class Mission(BaseModel):
-    id: Optional[str] = None
-    titre: str
-    description: str
-    type: str
-    objectif: int
-    recompense_xp: int
-    recompense_role: Optional[str] = None
 
 app = FastAPI(title="KatsuBot Dashboard", version="3.0.0")
 
@@ -100,9 +90,7 @@ def callback(code: str):
     user   = req.get(f"{DISCORD_API}/users/@me",        headers={"Authorization": f"Bearer {access_token}"}).json()
     guilds = req.get(f"{DISCORD_API}/users/@me/guilds", headers={"Authorization": f"Bearer {access_token}"}).json()
 
-    bot_data = lire_bot_data()
-
-    # ✅ Uniquement les serveurs admin ET où le bot est présent, avec infos enrichies
+    bot_data     = lire_bot_data()
     admin_guilds = []
     for g in guilds:
         is_admin    = (int(g["permissions"]) & 0x8) == 0x8
@@ -113,7 +101,7 @@ def callback(code: str):
                 **g,
                 "bot_present": True,
                 "members":     data.get("members", 0),
-                "icon_url":    data.get("icon"),  # URL complète depuis bot_data
+                "icon_url":    data.get("icon"),
             })
 
     sessions[access_token] = {"user": user, "guilds": admin_guilds}
@@ -187,35 +175,16 @@ def supprimer_role(guild_id: str, niveau: str):
     set_config(int(guild_id), "roles_niveaux", cfg["roles_niveaux"])
     return {"ok": True}
 
-@app.post("/config/{guild_id}/reaction_roles")
-def ajouter_reaction_role(guild_id: str, item: ReactionRole):
-    cfg = get_config(int(guild_id))
-    rr  = cfg.setdefault("reaction_roles", {})
-    rr.setdefault(item.message_id, {})[item.emoji] = item.role
-    set_config(int(guild_id), "reaction_roles", rr)
-    return {"ok": True}
-
-@app.delete("/config/{guild_id}/reaction_roles/{message_id}/{emoji}")
-def supprimer_reaction_role(guild_id: str, message_id: str, emoji: str):
-    cfg = get_config(int(guild_id))
-    rr  = cfg.get("reaction_roles", {})
-    if message_id not in rr or emoji not in rr[message_id]:
-        raise HTTPException(status_code=404, detail="Reaction role introuvable")
-    del rr[message_id][emoji]
-    if not rr[message_id]:
-        del rr[message_id]
-    set_config(int(guild_id), "reaction_roles", rr)
-    return {"ok": True}
-
 @app.get("/sanctions/{guild_id}")
 def get_toutes_sanctions(guild_id: str):
     bot_data = lire_bot_data()
     membres  = {m["id"]: m for m in bot_data.get(guild_id, {}).get("membres", [])}
+    data     = charger_data()
     result   = []
-    for doc in col_data.find({"guild_id": guild_id}, {"_id": 0}):
+    guild_data = data.get(guild_id, {})
+    for uid, doc in guild_data.items():
         sanctions = doc.get("sanctions", [])
         if sanctions:
-            uid    = doc.get("user_id")
             membre = membres.get(uid, {})
             result.append({
                 "user_id":   uid,
@@ -227,27 +196,17 @@ def get_toutes_sanctions(guild_id: str):
     result.sort(key=lambda x: x["total"], reverse=True)
     return result
 
-@app.delete("/sanctions/{guild_id}/{user_id}/{index}")
-def supprimer_sanction(guild_id: str, user_id: str, index: int):
-    doc = col_data.find_one({"guild_id": guild_id, "user_id": user_id})
-    if not doc:
-        raise HTTPException(status_code=404, detail="Membre introuvable")
-    sanctions = doc.get("sanctions", [])
-    if index >= len(sanctions):
-        raise HTTPException(status_code=404, detail="Sanction introuvable")
-    del sanctions[index]
-    col_data.update_one({"guild_id": guild_id, "user_id": user_id}, {"$set": {"sanctions": sanctions}})
-    return {"ok": True}
-
 @app.get("/membres/{guild_id}")
 def get_membres(guild_id: str, search: str = ""):
     bot_data = lire_bot_data()
     membres  = bot_data.get(guild_id, {}).get("membres", [])
+    data     = charger_data()
+    guild_data = data.get(guild_id, {})
     result   = []
     for m in membres:
         if search and search.lower() not in m["name"].lower():
             continue
-        doc = col_data.find_one({"guild_id": guild_id, "user_id": m["id"]}, {"_id": 0}) or {}
+        doc = guild_data.get(m["id"], {})
         result.append({
             **m,
             "xp":        doc.get("xp", 0),
@@ -258,52 +217,13 @@ def get_membres(guild_id: str, search: str = ""):
     result.sort(key=lambda x: x["xp"], reverse=True)
     return result[:50]
 
-@app.get("/profil/{guild_id}/{user_id}")
-def get_profil(guild_id: str, user_id: str):
-    bot_data = lire_bot_data()
-    membres  = {m["id"]: m for m in bot_data.get(guild_id, {}).get("membres", [])}
-    membre   = membres.get(user_id, {"name": f"User {user_id}", "avatar": "", "roles": [], "joined": "?"})
-    doc      = col_data.find_one({"guild_id": guild_id, "user_id": user_id}, {"_id": 0}) or {}
-    return {
-        **membre,
-        "xp":        doc.get("xp", 0),
-        "niveau":    doc.get("niveau", 0),
-        "warnings":  doc.get("warnings", 0),
-        "sanctions": doc.get("sanctions", []),
-    }
-
-@app.get("/missions/{guild_id}")
-def get_missions(guild_id: str):
-    return list(col_missions.find({"guild_id": guild_id}, {"_id": 0}))
-
-@app.post("/missions/{guild_id}")
-def ajouter_mission(guild_id: str, mission: Mission):
-    import uuid
-    d = mission.dict()
-    d["id"]       = str(uuid.uuid4())[:8]
-    d["guild_id"] = guild_id
-    col_missions.insert_one(d)
-    d.pop("_id", None)
-    return {"ok": True, "mission": d}
-
-@app.delete("/missions/{guild_id}/{mission_id}")
-def supprimer_mission(guild_id: str, mission_id: str):
-    r = col_missions.delete_one({"guild_id": guild_id, "id": mission_id})
-    if r.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Mission introuvable")
-    return {"ok": True}
-
-@app.get("/logs/{guild_id}")
-def get_logs(guild_id: str, limit: int = 50):
-    logs = list(col_logs.find({"guild_id": guild_id}, {"_id": 0}).sort("_id", -1).limit(limit))
-    return logs
-
 @app.get("/stats/{guild_id}")
 def get_stats(guild_id: str):
-    docs    = list(col_data.find({"guild_id": guild_id}, {"_id": 0}))
-    joueurs = [{"user_id": d["user_id"], "xp": d.get("xp",0), "niveau": d.get("niveau",0)} for d in docs]
+    data       = charger_data()
+    guild_data = data.get(guild_id, {})
+    joueurs    = [{"user_id": uid, "xp": d.get("xp",0), "niveau": d.get("niveau",0)} for uid, d in guild_data.items()]
     joueurs.sort(key=lambda x: x["xp"], reverse=True)
-    total_sanctions = sum(len(d.get("sanctions",[])) for d in docs)
+    total_sanctions = sum(len(d.get("sanctions",[])) for d in guild_data.values())
     return {
         "total_membres":   len(joueurs),
         "top10":           joueurs[:10],

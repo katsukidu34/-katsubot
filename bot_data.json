@@ -523,39 +523,6 @@
     ],
     "membres": [
       {
-        "id": "1402597790713905248",
-        "name": "🎁👮  Ricktifier/riku",
-        "avatar": "https://cdn.discordapp.com/avatars/1402597790713905248/8304df9c0fbaace9d1d5d7fa03ada661.png?size=1024",
-        "roles": [
-          "Rank D",
-          "Rank E",
-          "Membre",
-          "🌟 🌟 🌟",
-          "Staff",
-          "Administrateur"
-        ],
-        "joined": "11/02/2026"
-      },
-      {
-        "id": "971425356676493342",
-        "name": "🎁Katsuking[Pommestuki]",
-        "avatar": "https://cdn.discordapp.com/guilds/1324360051820859472/users/971425356676493342/avatars/fa51bf845c2f198be93053be338a6571.png?size=1024",
-        "roles": [
-          "spécial",
-          "Twitch Subscriber: Tier 3",
-          "Twitch Subscriber",
-          "Vidéaste",
-          "Annonce live",
-          "Rank A",
-          "Sortie",
-          "🎖️ Spécial",
-          "Créateur de contenu",
-          "Staff",
-          "Fondateur"
-        ],
-        "joined": "02/01/2025"
-      },
-      {
         "id": "1138097819333443675",
         "name": "shadow/👾",
         "avatar": "https://cdn.discordapp.com/avatars/1138097819333443675/79c5d300083ae67cee149bf62c6fe5fd.png?size=1024",
@@ -1001,6 +968,25 @@
         "joined": "06/08/2025"
       },
       {
+        "id": "971425356676493342",
+        "name": "🎁Katsuking[Pommestuki]",
+        "avatar": "https://cdn.discordapp.com/guilds/1324360051820859472/users/971425356676493342/avatars/fa51bf845c2f198be93053be338a6571.png?size=1024",
+        "roles": [
+          "spécial",
+          "Twitch Subscriber: Tier 3",
+          "Twitch Subscriber",
+          "Vidéaste",
+          "Annonce live",
+          "Rank A",
+          "Sortie",
+          "🎖️ Spécial",
+          "Créateur de contenu",
+          "Staff",
+          "Fondateur"
+        ],
+        "joined": "02/01/2025"
+      },
+      {
         "id": "1330902149193924708",
         "name": "Manarzk",
         "avatar": "https://cdn.discordapp.com/avatars/1330902149193924708/329bb977703f26239086f6d18c014cf7.png?size=1024",
@@ -1009,6 +995,20 @@
           "Membre"
         ],
         "joined": "07/02/2026"
+      },
+      {
+        "id": "1402597790713905248",
+        "name": "🎁👮  Ricktifier/riku",
+        "avatar": "https://cdn.discordapp.com/avatars/1402597790713905248/8304df9c0fbaace9d1d5d7fa03ada661.png?size=1024",
+        "roles": [
+          "Rank D",
+          "Rank E",
+          "Membre",
+          "🌟 🌟 🌟",
+          "Staff",
+          "Administrateur"
+        ],
+        "joined": "11/02/2026"
       },
       {
         "id": "1043664267850825838",
